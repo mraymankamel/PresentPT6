@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quantum Nexus Challenge</title>
+
+    <meta property="og:title" content="🌌 تحدي الكوانتم 🚀">
+    <meta property="og:description" content="تحدي غامض ومكثف مصمم لقياس تركيزك. هل تمتلك الشفرة؟">
+    <meta property="og:image" content="https://dummyimage.com/1200x630/0B0C10/64FFDA.png&text=Quantum+Matrix">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Outfit:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        /* 🌌 Quantum Nexus Theme Variables */
+        :root {
+            --bg-dark: #07090F;
+            --glass-bg: rgba(7, 9, 15, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --q-font-size: 22px; 
+            --error-color: #F43F5E;
+            --success-color: #10B981;
+        }
+
+        body.theme-1 { --accent: #00F0FF; --accent-glow: rgba(0, 240, 255, 0.35); } 
+        body.theme-2 { --accent: #B026FF; --accent-glow: rgba(176, 38, 255, 0.35); } 
+        body.theme-3 { --accent: #00FF9D; --accent-glow: rgba(0, 255, 157, 0.35); } 
+        body.theme-4 { --accent: #FF2A6D; --accent-glow: rgba(255, 42, 109, 0.35); } 
+        body.theme-5 { --accent: #FFD700; --accent-glow: rgba(255, 215, 0, 0.35); } 
+
+        /* Protection & Selectability */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        input { -webkit-user-select: auto !important; -moz-user-select: auto !important; -ms-user-select: auto !important; user-select: auto !important; pointer-events: auto !important;}
+        .review-item *, .explanation-box * { -webkit-user-select: text; user-select: text; }
+
+        body, .glass-panel, .accent-text, .btn, .timer-box, .badge-award, .bg-orb, .vip-phone, header img, .hud-progress-wrapper::before {
+            transition: background 1.5s ease, border-color 1.5s ease, box-shadow 1.5s ease, color 1.5s ease, transform 0.3s ease;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px 10px;
+            overflow-x: hidden;
+        }
+
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 35px 35px;
+        }
+        .bg-orb {
+            position: fixed; top: -30%; left: -20%; width: 70vw; height: 70vw;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+            z-index: 0; filter: blur(80px); pointer-events: none;
+        }
+
+        .main-container {
+            width: 100%; max-width: 850px; margin: 0 auto;
+            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px; border: 1px solid var(--glass-border);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; position: relative; z-index: 10;
+        }
+
+        /* --- Header Hierarchy --- */
+        header {
+            padding: 35px 20px 25px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+            border-bottom: 1px solid var(--glass-border); position: relative;
+        }
+        
+        header img {
+            width: 110px; height: 110px; object-fit: contain; margin-top: 10px;
+            background-color: #FFFFFF !important; padding: 5px; border-radius: 50%;
+            border: 3px solid var(--accent); box-shadow: 0 0 35px var(--accent-glow);
+            transition: 0.3s; cursor: pointer; flex-shrink: 0; aspect-ratio: 1/1;
+        }
+        header img:hover { transform: scale(1.05); }
+        
+        header h1 { font-family: 'Outfit', sans-serif; font-size: 28px; color: var(--text-main); font-weight: 900; margin: 10px 0 0; letter-spacing: 1px; direction: ltr;}
+        header .job-title { font-size: 15px; font-weight: 700; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin: 0 0 5px; direction: ltr;}
+        header .slogan { 
+            font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; font-style: italic; 
+            color: var(--accent); letter-spacing: 1px; margin: 5px 0 10px 0; 
+            direction: ltr; unicode-bidi: isolate; display: inline-block;
+        }
+        
+        .vip-phone {
+            background: var(--accent); color: var(--bg-dark); font-family: 'Outfit', sans-serif;
+            padding: 8px 26px; border-radius: 30px; font-weight: 900; font-size: 16px; letter-spacing: 2px;
+            box-shadow: 0 0 20px var(--accent-glow); margin-top: 5px;
+            display: inline-flex; align-items: center; justify-content: center; direction: ltr;
+        }
+
+        /* --- Controls (Timer Box Left, Eye Icon Right) --- */
+        .time-controls { 
+            position: absolute; top: 20px; left: 20px; display: flex; align-items: center; gap: 8px; z-index: 20; 
+            direction: ltr; 
+        }
+        .timer-box {
+            background: rgba(0,0,0,0.8); color: var(--text-main); border: 1px solid var(--accent);
+            border-radius: 8px; padding: 0 15px; height: 40px; display: flex; align-items: center;
+            font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 16px; letter-spacing: 1px;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .time-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; margin-right: 8px; animation: blink 1s infinite;}
+        .timer-box.danger { color: var(--error-color); border-color: var(--error-color); box-shadow: 0 0 15px rgba(244,63,94,0.5);}
+        .timer-box.danger .time-dot { background: var(--error-color); }
+        .hidden-timer { color: transparent !important; border-color: rgba(255,255,255,0.1); box-shadow: none;}
+        
+        .icon-btn {
+            background: rgba(0,0,0,0.8); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; outline: none; transition: 0.2s;
+        }
+        .icon-btn:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px var(--accent-glow);}
+        
+        .eye-care-controls { position: absolute; top: 20px; right: 20px; display: flex; gap: 8px; z-index: 20;}
+
+        /* --- Cheers (Perfect Alignment) --- */
+        .cheer-wrapper { position: fixed; top: -120px; right: 20px; z-index: 99999; pointer-events: none; transition: top 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .cheer-wrapper.show { top: 20px; }
+        .cheer-bubble {
+            background: rgba(7, 9, 15, 0.98); backdrop-filter: blur(15px); border-radius: 12px;
+            padding: 15px 20px; display: flex; align-items: center; gap: 15px;
+            border: 1px solid rgba(255,255,255,0.1); border-right: 4px solid var(--accent);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9); direction: rtl;
+        }
+        .cheer-bubble img { 
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); 
+            background: #FFFFFF !important; padding: 4px; flex-shrink: 0; object-fit: contain; aspect-ratio: 1/1;
+            margin: auto 0;
+        }
+        .cheer-text { display: flex; flex-direction: column; width: 100%; min-width: 200px; justify-content: center;}
+        .cheer-en { font-family:'Outfit', sans-serif; font-size:14px; font-weight:900; color:#fff; direction:ltr; text-align:left; padding-bottom: 8px; line-height: 1.2;}
+        .cheer-ar { font-family:'Cairo', sans-serif; font-size:13px; font-weight:800; color:var(--accent); direction:rtl; text-align:right; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px; line-height: 1.2;}
+
+        .shake-active { animation: shake 0.4s both; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 50% {transform: translateX(5px);} 75% {transform: translateX(-5px);} }
+        @keyframes blink { 0%, 100% {opacity:1;} 50% {opacity:0.2;} }
+
+        /* --- Content --- */
+        .content-body { padding: 30px 25px; flex: 1; position: relative;}
+
+        #start-screen { text-align: center; }
+        .welcome-card {
+            background: rgba(0,0,0,0.4); border-radius: 16px; padding: 40px 20px; margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .welcome-card h3 { font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 15px; text-shadow: 0 0 15px var(--accent-glow);}
+        .welcome-card p { font-size: 15px; color: var(--text-muted); line-height: 1.8; font-weight: 600;}
+
+        /* Time Attack Button */
+        #time-attack-btn {
+            background: rgba(244, 63, 94, 0.05); color: var(--error-color); border: 1px dashed var(--error-color);
+            padding: 15px; border-radius: 12px; cursor: pointer; margin-bottom: 25px; font-weight: 800; font-size: 15px; width: 100%; transition: 0.3s;
+            font-family: 'Outfit', 'Cairo', sans-serif;
+        }
+        #time-attack-btn.active {
+            background: rgba(244, 63, 94, 0.15); color: #fff; border-style: solid;
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.4); text-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        .avatar-grid { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+        .avatar-option { font-size: 28px; padding: 10px 15px; background: rgba(0,0,0,0.4); border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition:0.2s;}
+        .avatar-option.selected { background: var(--accent-glow); border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); transform: scale(1.1);}
+
+        .input-group input {
+            width: 100%; padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.5); color: var(--accent); font-size: 18px; outline: none; margin-bottom: 25px; font-weight: 800; text-align: center;
+        }
+        .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        .input-group input::placeholder { color: var(--text-muted); font-weight: 600;}
+
+        #quiz-screen { display: none; }
+        
+        /* 🚀 Moving Avatar Progress Bar */
+        .hud-progress-wrapper {
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px; padding: 15px 20px 25px 20px; margin-bottom: 30px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .hud-progress-wrapper::before {
+            content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%;
+            background: var(--accent); box-shadow: 0 0 15px var(--accent); border-radius: 0 12px 12px 0;
+        }
+        .hud-stats {
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative; z-index: 2; direction: rtl; 
+        }
+        .hud-student { font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 16px; color: #fff; display: flex; align-items: center; gap: 10px;}
+        .hud-student .avatar-ring {
+            background: rgba(255,255,255,0.1); border: 1px solid var(--accent);
+            width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 10px var(--accent-glow); font-size: 20px; flex-shrink: 0; aspect-ratio: 1 / 1;
+        }
+        .hud-counter { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 16px; color: var(--accent); letter-spacing: 2px; direction: ltr; flex-shrink: 0;}
+        
+        .hud-bar-container {
+            margin-top: 18px; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; position: relative; z-index: 2; direction: ltr;
+            margin-right: 18px; 
+        }
+        .hud-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px var(--accent); position: relative; border-radius: 3px;}
+        .hud-avatar-runner {
+            position: absolute; right: -18px; top: 50%; transform: translateY(-50%);
+            width: 36px; height: 36px; background: var(--bg-dark); border: 2px solid var(--accent);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; box-shadow: 0 0 15px var(--accent), inset 0 0 8px rgba(0,0,0,0.5); z-index: 5;
+            transition: border-color 1.5s ease, box-shadow 1.5s ease; aspect-ratio: 1 / 1; line-height: 1;
+        }
+
+        .station-card {
+            background: rgba(0,0,0,0.4); padding: 30px 25px; border-radius: 16px; margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); position: relative; z-index:10;
+        }
+        
+        /* 🔊 Fixed TTS Button Positioning */
+        .question-text { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; direction: ltr; position: relative; min-height: 44px;}
+        .question-text-wrapper { flex: 1; font-family: 'Outfit', sans-serif; font-size: var(--q-font-size); font-weight: 800; color: #fff; line-height: 1.6; transition: font-size 0.3s;}
+        .cursor { display: inline-block; width: 4px; height: 1em; background: var(--accent); margin-left: 4px; animation: blink 0.8s infinite; vertical-align: text-bottom;}
+        .tts-btn-container { flex-shrink: 0; align-self: center; display: flex; align-items: center; justify-content: center;}
+        
+        .options-list { display: flex; flex-direction: column; gap: 14px; direction: ltr; opacity: 0; pointer-events: none; transition: opacity 0.5s;}
+        .options-list.show-options { opacity: 1; pointer-events: auto; }
+        
+        .option-item {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);
+            border-left: 4px solid var(--text-muted); border-radius: 10px; padding: 15px 20px; 
+            cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.2s;
+        }
+        .option-item:hover { background: rgba(255,255,255,0.06); border-left-color: var(--accent); }
+        .option-item.selected { 
+            background: var(--accent-glow); border-color: var(--accent); border-left: 6px solid var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .opt-letter {
+            background: rgba(0,0,0,0.5); color: var(--accent); width: 35px; height: 35px; flex-shrink: 0;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 16px; border: 1px solid var(--accent-glow); aspect-ratio: 1/1;
+        }
+        .option-item.selected .opt-letter { background: var(--accent); color: var(--bg-dark); }
+        .opt-text { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 17px; color: #fff; }
+
+        .action-btns { display: flex; justify-content: space-between; gap: 15px; direction: ltr;}
+        .btn {
+            padding: 16px 24px; border-radius: 12px; font-weight: 900; font-size: 15px; border: 1px solid var(--accent);
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: 'Outfit', 'Cairo', sans-serif; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+        }
+        .btn-outline { background: transparent; color: var(--accent); }
+        .btn-outline:hover:not(:disabled) { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 20px var(--accent-glow);}
+        .btn-prev { min-width: 120px; border-color: rgba(255,255,255,0.1); color: var(--text-muted);}
+        .btn-prev:hover:not(:disabled) { border-color: var(--text-main); color: var(--text-main); background:transparent; box-shadow:none;}
+        .btn-prev:disabled { opacity: 0.2; cursor: not-allowed;}
+        
+        .btn-solid { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 20px var(--accent-glow); flex: 1; font-size:17px;}
+        .btn-solid:disabled { opacity: 0.4; cursor: wait; background: rgba(0,0,0,0.5); color: var(--text-muted); box-shadow: none; border-color:transparent;}
+
+        /* --- Smart Revision & Results --- */
+        #result-screen { display: none; direction: rtl; }
+        .score-card { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 40px 20px; text-align: center; margin-bottom: 30px; border: 1px solid var(--glass-border); position: relative;}
+        
+        /* 🏆 Giant LTR Score Circle */
+        .score-circle {
+            width: 220px; height: 220px; border-radius: 50%; margin: 0 auto 25px; 
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif; font-size: 55px; font-weight: 900; color: var(--bg-dark); 
+            background: var(--accent); border: 8px solid var(--bg-dark); 
+            box-shadow: 0 0 50px var(--accent-glow), 0 0 0 4px var(--accent);
+            white-space: nowrap; direction: ltr; letter-spacing: 2px;
+        }
+        #score-percent-text { font-family: 'Outfit', 'Cairo'; font-size: 22px; font-weight: 900; color: var(--accent); margin-bottom: 5px; letter-spacing: 1px;}
+        
+        #student-display-name { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 12px;}
+        .result-avatar { 
+            font-size: 32px; background: rgba(255,255,255,0.1); border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent-glow);
+            border-radius: 50%; width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0; aspect-ratio: 1/1;
+        }
+        
+        .scratch-container { position: relative; display: inline-block; margin-top: 15px; border-radius: 12px; overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,0.8); border: 1px solid var(--accent);}
+        .badge-award { display: inline-block; background: var(--accent); color: var(--bg-dark); padding: 20px 30px; font-weight: 900; font-size: 20px; min-width: 280px; min-height: 65px; font-family: 'Outfit', 'Cairo'; text-transform: uppercase; letter-spacing: 1px;}
+        #scratch-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; z-index: 5; }
+
+        .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px;}
+        .result-actions .btn { width: 100%; font-size: 14px; padding: 15px; border-radius: 8px;}
+        .btn-full { grid-column: span 2; }
+        .btn-whatsapp { background: #25D366; color: #fff; border-color: #25D366; }
+        .btn-whatsapp:hover { box-shadow: 0 0 15px rgba(37,211,102,0.4); background:#1EBE5D; color:#fff;}
+        .btn-pdf { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #fff;}
+        .btn-pdf:hover { background: #fff; color: #000;}
+
+        /* Smart Explanation Formatting */
+        .review-item { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 25px; margin-bottom: 20px; text-align: left; direction: ltr; border: 1px solid rgba(255,255,255,0.05);}
+        .review-item.is-correct { border-left: 5px solid var(--success-color); }
+        .review-item.is-wrong { border-left: 5px solid var(--error-color); }
+        .explanation-box { background: rgba(0,0,0,0.6); border-radius: 8px; padding: 18px; margin-top: 15px; border-right: 3px solid var(--accent); display: flex; flex-direction: column; gap: 12px; }
+        .exp-en { direction: ltr; text-align: left; color: var(--text-muted); font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; line-height: 1.6; }
+        .exp-separator { width: 100%; height: 1px; background: rgba(255,255,255,0.05); border-bottom: 1px dashed rgba(255,255,255,0.2); }
+        .exp-ar { direction: rtl; text-align: right; color: #fff; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 14px; line-height: 1.7; }
+
+        /* --- Anti-Cheat Modal --- */
+        #cheat-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.95); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        }
+        .cheat-content {
+            background: #0B0C10; padding: 40px; border-radius: 16px; text-align: center;
+            max-width: 90%; width: 450px; border: 2px solid var(--error-color); box-shadow: 0 0 40px rgba(244, 63, 94, 0.3);
+        }
+        .cheat-content h1 { color: var(--error-color); font-size: 28px; margin-bottom: 15px; font-weight: 900;}
+        .cheat-content p { color: var(--text-main); font-size: 16px; line-height: 1.6; font-weight: 600; margin-bottom: 25px;}
+
+        /* --- PDF Print Styles --- */
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important;}
+            body { background: #fff !important; color: #000 !important; }
+            body > * { display: none !important; }
+            body.print-errors-only .main-container,
+            body.print-errors-only .main-container #result-screen,
+            body.print-errors-only .main-container #result-screen #review-list { display: block !important; }
+            body.print-errors-only .main-container { box-shadow: none !important; border: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; background: #fff !important;}
+            .score-card, .result-actions, header, h3 { display: none !important; }
+            .review-item { border: 1px solid #ccc !important; background: #f9f9f9 !important; page-break-inside: avoid; margin-bottom: 15px !important; padding: 15px !important;}
+            .review-item.is-correct { display: none !important; } 
+            .review-item.is-wrong { border-left: 5px solid #F43F5E !important; }
+            .review-item * { color: #000 !important; text-shadow: none !important;}
+            .explanation-box { background: #eee !important; border-right: 3px solid #666 !important; }
+            .exp-ar { display: block !important; color: #000 !important; }
+            .exp-separator { border-bottom: 1px solid #ccc !important; }
+            body.print-errors-only::before {
+                content: "Smart Revision Report - Errors Only (Mr. Ayman Kamel)";
+                display: block; text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #000;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px 5px; }
+            .main-container { width: 100%; border-radius: 16px;}
+            header { padding: 45px 15px 15px; }
+            .vip-phone { font-size: 13px; padding: 5px 15px; top: 15px; }
+            header img { width: 90px; height: 90px; margin-top: 15px;}
+            header h1 { font-size: 22px; }
+            
+            .time-controls { top: 10px; left: 10px; gap: 6px;}
+            .timer-box { font-size: 13px; height: 35px; padding: 0 10px; }
+            .icon-btn { width: 35px; height: 35px; font-size: 15px; }
+            .eye-care-controls { top: 10px; right: 10px; gap: 6px;}
+
+            .cheer-wrapper { right: 10px; max-width: calc(100vw - 20px); }
+            .cheer-wrapper.show { top: 15px; }
+            .cheer-bubble { padding: 10px 12px; gap: 12px; }
+            .cheer-bubble img { width: 40px; height: 40px; }
+            .cheer-en { font-size: 13px; padding-bottom: 5px; }
+            .cheer-ar { font-size: 12px; padding-top: 5px; }
+
+            .content-body { padding: 20px 15px; }
+            .welcome-card { padding: 25px 15px; }
+            .welcome-card h3 { font-size: 20px; }
+            .avatar-option { font-size: 24px; padding: 8px 12px; }
+            
+            .hud-progress-wrapper { padding: 12px 15px 20px 15px; }
+            .hud-student { font-size: 15px; }
+            .hud-student .avatar-ring { width: 30px; height: 30px; font-size: 16px;}
+            .hud-counter { font-size: 14px; }
+            .hud-avatar-runner { width: 30px; height: 30px; font-size: 15px; right: -15px; }
+            .hud-bar-container { margin-right: 15px; }
+            
+            .station-card { padding: 25px 15px; }
+            .question-text { font-size: var(--q-font-size); gap: 10px; margin-bottom: 20px;}
+            .opt-letter { width: 30px; height: 30px; font-size: 14px; }
+            .opt-text { font-size: 15px; }
+            .option-item { padding: 12px 15px; }
+            
+            .action-btns { flex-direction: column-reverse; gap: 10px; margin-top: 25px;}
+            .btn { width: 100%; font-size: 14px; padding: 14px; }
+            
+            .result-actions { grid-template-columns: 1fr; gap: 10px;}
+            .btn-full { grid-column: span 1; }
+            
+            .score-circle { width: 170px; height: 170px; font-size: 42px; border-width: 6px; box-shadow: 0 0 40px var(--accent-glow), 0 0 0 3px var(--accent); }
+            .result-avatar { width: 50px; height: 50px; font-size: 26px; }
+            .badge-award { font-size: 16px; min-width: 220px; padding: 15px;}
+        }
+    </style>
+</head>
+<body id="main-body" class="theme-1">
+
+<div class="bg-orb"></div>
+<div class="bg-grid"></div>
+
+<!-- 🛡️ Anti-Cheat Modal -->
+<div id="cheat-modal">
+    <div class="cheat-content">
+        <h1>🚨 نظام المراقبة الصامت</h1>
+        <p id="cheat-msg">تم رصد فقدان التركيز والخروج من شاشة التقييم.</p>
+        <button onclick="document.getElementById('cheat-modal').style.display='none'" class="btn btn-outline" style="color:var(--error-color); border-color:var(--error-color); width:100%;">أعتذر، سأحافظ على تركيزي</button>
+    </div>
+</div>
+
+<div class="main-container" id="app-container">
+    <header>
+        <!-- ⏱️ Timer (Left) & Eye Icon (Right of Timer) -->
+        <div class="time-controls" id="timer-container" style="display: none;">
+            <div class="timer-box" id="timer-box"><div class="time-dot"></div><span id="timer-text">60:00</span></div>
+            <button type="button" class="icon-btn" id="btn-timer-view" onclick="toggleTimerView()" title="إخفاء الوقت">⏱️</button>
+        </div>
+
+        <div class="eye-care-controls" id="eye-care-container" style="display: none;">
+            <button type="button" class="icon-btn" onclick="changeFontSize(2)" title="تكبير الخط">A+</button>
+            <button type="button" class="icon-btn" onclick="changeFontSize(-2)" title="تصغير الخط">A-</button>
+        </div>
+
+        <!-- 🧠 Cheer Bubble -->
+        <div class="cheer-wrapper" id="cheer-wrapper">
+            <div class="cheer-bubble">
+                <img src="https://lh3.googleusercontent.com/d/1BqwA44F0BAwWMSwBnBeDIkfkNgBEtif-" alt="Mr. Ayman Kamel">
+                <div class="cheer-text">
+                    <div class="cheer-en" id="cheer-en"></div>
+                    <div class="cheer-ar" id="cheer-ar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Branding -->
+        <img src="https://lh3.googleusercontent.com/d/1BqwA44F0BAwWMSwBnBeDIkfkNgBEtif-" alt="Mr. Ayman Kamel Logo" onclick="triggerEasterEgg()">
+        <h1>Mr. Ayman Kamel</h1>
+        <p class="job-title">English Language Educator</p>
+        <p class="slogan">"Let's learn together!"</p>
+        <div class="vip-phone">📞 01284749899</div>
+    </header>
+
+    <div class="content-body">
+        <div id="start-screen">
+            <div class="welcome-card">
+                <h3>🌟 خطوتك نحو القمة تبدأ هنا!</h3>
+                <p>أنت دلوقتي قدام تحدي مش بيعترف غير بالتركيز المطلق. الأسئلة متصممة عشان تقيس قدرتك على ربط المعاني واستيعاب كل تفصيلة. خليك واثق في نفسك، واقرأ براحتك.. إحنا هنا عشان نحتفل بنجاحك!<br><br>جاهز تثبت جدارتك؟</p>
+            </div>
+
+            <button type="button" id="time-attack-btn" onclick="toggleTimeAttack()">⏳ وضع التحدي السريع (15ث): متوقف</button>
+
+            <h4 style="color: var(--text-main); font-weight: 800; margin-bottom: 15px; text-align: center;">اختار مفتاح العبور بتاعك:</h4>
+            <div class="avatar-grid">
+                <div class="avatar-option selected" onclick="selectAvatar(this, '🌌')">🌌</div>
+                <div class="avatar-option" onclick="selectAvatar(this, '🔮')">🔮</div>
+                <div class="avatar-option" onclick="selectAvatar(this, '🛡️')">🛡️</div>
+                <div class="avatar-option" onclick="selectAvatar(this, '👁️‍🗨️')">👁️‍🗨️</div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي عشان نبدأ..." autocomplete="off" onkeypress="if(event.key === 'Enter') startQuiz()">
+            </div>
+            <!-- Start Button (English) -->
+            <button type="button" class="btn btn-solid" style="width:100%" onclick="startQuiz()">START ASSESSMENT ➔</button>
+        </div>
+
+        <div id="quiz-screen">
+            <!-- ⚡ HUD Progress Bar -->
+            <div class="hud-progress-wrapper">
+                <div class="hud-stats">
+                    <div class="hud-student">
+                        <div class="avatar-ring" id="hud-avatar">🌌</div> <span id="hud-name">--</span>
+                    </div>
+                    <div class="hud-counter" id="progress-count">Q: 1 / 22</div>
+                </div>
+                <div class="hud-bar-container">
+                    <div class="hud-bar-fill" id="energy-bar">
+                        <!-- 🏃‍♂️ Moving Avatar -->
+                        <div class="hud-avatar-runner" id="hud-moving-avatar">🌌</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="station-card" id="q-box">
+                <!-- 🔊 TTS Button Middle Right strictly -->
+                <div class="question-text">
+                    <div class="question-text-wrapper">
+                        <span id="question-text-content">--</span><span class="cursor" id="typing-cursor" style="display:none;"></span>
+                    </div>
+                    <div class="tts-btn-container">
+                        <button type="button" class="icon-btn" style="border-color:var(--accent); color:var(--accent);" onclick="speakQuestion()" title="استماع">🔊</button>
+                    </div>
+                </div>
+                <div class="options-list" id="options-list"></div>
+            </div>
+
+            <div class="action-btns">
+                <!-- Navigation Buttons (English) -->
+                <button type="button" class="btn btn-prev" id="prev-btn" onclick="prevQuestion()" disabled>⬅ PREV</button>
+                <button type="button" class="btn btn-solid" id="next-btn" onclick="nextQuestion()">NEXT ➔</button>
+                <!-- 🚀 Direct Submit Button -->
+                <button type="button" class="btn btn-solid" id="submit-btn" onclick="calculateScore()" style="display: none;">🚀 SUBMIT</button>
+            </div>
+        </div>
+
+        <div id="result-screen">
+            <div class="score-card">
+                <!-- 🏆 Giant LTR Score Circle -->
+                <div class="score-circle" id="score-percentage">0 / 0</div>
+                <div id="score-percent-text">Accuracy: 0%</div>
+                <!-- Student Name with Avatar Perfect Circle -->
+                <h2 id="student-display-name"></h2>
+                
+                <div class="scratch-container">
+                    <div id="badge-award-box" class="badge-award">اخدش لترى حالتك</div>
+                    <canvas id="scratch-canvas"></canvas>
+                </div>
+                <p id="score-details" style="font-size: 15px; font-weight: 700; margin-top: 20px; color: var(--text-muted);"></p>
+            </div>
+
+            <div class="result-actions">
+                <button type="button" class="btn btn-solid btn-full" id="cert-btn" onclick="downloadCertificate()" style="display: none;">📜 استخراج شهادة النخبة</button>
+                <button type="button" class="btn btn-outline" style="background:rgba(255,255,255,0.05); color:#fff; border-color:rgba(255,255,255,0.2);" onclick="downloadSmartRevision()">📥 تحميل روشتة الأخطاء PDF</button>
+                <button type="button" class="btn btn-outline btn-whatsapp" onclick="shareToTeacherWhatsApp()">👨‍🏫 إرسال التقرير لمستر أيمن</button>
+                <button type="button" class="btn btn-outline btn-whatsapp" onclick="shareToParentWhatsApp()">👨‍👩‍👧 تقرير ولي الأمر (واتساب)</button>
+                <button type="button" class="btn btn-outline" style="color:#64FFDA; border-color:#64FFDA;" onclick="sharePeerChallenge()">🔥 تحدى زميلك (فيرال)</button>
+                <button type="button" class="btn btn-outline" onclick="location.reload()">🔄 إعادة المحاولة</button>
+            </div>
+
+            <h3 style="text-align: right; color: var(--text-main); margin-top: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; font-weight: 900;">📂 المراجعة اللحظية (Smart Revision):</h3>
+            <div id="review-list" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- EmailJS Setup ---
+const EMAILJS_SERVICE_ID = "service_uu1lnnq";
+const EMAILJS_PUBLIC_KEY = "KUgWaj4LYP2IAcRuZ";
+const EMAILJS_TEMPLATE_ID = "template_vlyjktl";
+(function(){ if (typeof emailjs !== 'undefined') emailjs.init(EMAILJS_PUBLIC_KEY); })();
+
+function tryVibrate(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch(e){} } }
+
+let audioCtx = null;
+function initAudio() {
+    try {
+        if (!audioCtx) { const AudioContext = window.AudioContext || window.webkitAudioContext; if(AudioContext) { audioCtx = new AudioContext(); } }
+        if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
+    } catch(e) {}
+}
+function playTone(freq, type, duration) {
+    try {
+        initAudio(); if (!audioCtx) return;
+        let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.type = type; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+}
+function soundWrongTime() { tryVibrate([100, 50, 100]); playTone(150, 'sawtooth', 0.3); setTimeout(()=>playTone(100, 'sawtooth', 0.4), 200); }
+function soundBossWin() { tryVibrate([200, 100, 200, 100, 200]); [523, 659, 783, 1046, 1318].forEach((f,i)=> setTimeout(()=>playTone(f,'square',0.15), i*100)); }
+
+function speakQuestion() {
+    if ('speechSynthesis' in window) {
+        let text = quizData[currentQuestion].originalQ.replace(/_+/g, "blank");
+        let msg = new SpeechSynthesisUtterance(text); msg.lang = 'en-US'; msg.rate = 0.85;
+        window.speechSynthesis.speak(msg);
+    }
+}
+
+// Scratch Card
+function initScratchCard() {
+    const container = document.getElementById("badge-award-box");
+    const canvas = document.getElementById("scratch-canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = container.offsetWidth; canvas.height = container.offsetHeight;
+    
+    let currentAccent = getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#64FFDA';
+    ctx.fillStyle = '#0B0C10'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "bold 16px 'Cairo', sans-serif"; ctx.fillStyle = currentAccent;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("🪄 اخدش عشان تشوف نتيجتك", canvas.width/2, canvas.height/2);
+    
+    let isDrawing = false;
+    function scratch(e) {
+        if(!isDrawing) return; e.preventDefault();
+        let rect = canvas.getBoundingClientRect();
+        let x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+        let y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI*2); ctx.fill();
+    }
+    canvas.onmousedown = () => isDrawing = true; canvas.ontouchstart = () => isDrawing = true;
+    canvas.onmouseup = () => isDrawing = false; canvas.ontouchend = () => isDrawing = false;
+    canvas.onmousemove = scratch; canvas.ontouchmove = scratch;
+}
+
+// 🧠 Egyptian Slang Cheers 
+const cheers = [
+    {en: "🚀 Keep pushing forward!", ar: "عاش يا وحش، كمل في طريقك!"},
+    {en: "🧠 Stay focused!", ar: "الله ينور، تركيزك عالي جداً!"},
+    {en: "💪 You're doing great!", ar: "مجهود جبار، متوقفش خالص!"},
+    {en: "🌟 Trust your instincts!", ar: "خليك واثق في إجاباتك، أنت قدها!"},
+    {en: "🛡️ Every step makes you stronger!", ar: "استمر! كل سؤال بيقربك للتقفيل!"},
+    {en: "🔥 Don't give up!", ar: "أوعى تستسلم، هانت جداً يا بطل!"},
+    {en: "🎯 Keep your eyes on the goal!", ar: "عينك على الدرجة النهائية، ركز!"},
+    {en: "🧘 Take a deep breath...", ar: "خد نفس عميق، وكمل برواقة."},
+    {en: "⚡ Your effort matters!", ar: "تعبك وتركيزك ده مستحيل يروح عالفاضي!"}
+];
+let lastCheerIndex = -1; 
+function triggerTeacherCheer() {
+    const wrapper = document.getElementById("cheer-wrapper");
+    let randomIndex; do { randomIndex = Math.floor(Math.random() * cheers.length); } while (randomIndex === lastCheerIndex); 
+    lastCheerIndex = randomIndex;
+    document.getElementById("cheer-en").innerText = cheers[randomIndex].en;
+    document.getElementById("cheer-ar").innerText = cheers[randomIndex].ar;
+    wrapper.classList.add("show"); setTimeout(() => { wrapper.classList.remove("show"); }, 3500);
+}
+
+let logoClicks = 0, logoClickTimer;
+function triggerEasterEgg() {
+    logoClicks++; clearTimeout(logoClickTimer);
+    logoClickTimer = setTimeout(() => { logoClicks = 0; }, 1500);
+    if(logoClicks >= 5) { soundEasterEgg(); alert("⚡ Quantum Matrix Easter Egg Found! ⚡"); logoClicks = 0; }
+}
+
+function changeFontSize(change) {
+    const root = document.documentElement;
+    let currentSize = parseInt(getComputedStyle(root).getPropertyValue('--q-font-size')) || 22;
+    let newSize = currentSize + change;
+    if(newSize >= 16 && newSize <= 30) { root.style.setProperty('--q-font-size', newSize + 'px'); }
+}
+
+// 📚 Data Array (Extracted from Images - 22 Questions perfectly mapped)
+const rawData = [
+    { q: "He's out of breath because he ........", options: ["was running", "had run", "has run", "has been running"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Present physical evidence (out of breath) of a continuous action that just stopped. We use present perfect continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما يكون فيه أثر بدني واضح في الحاضر (بينهج) لحدث كان مستمر وخلص للتو (الجري)، بنستخدم مضارع تام مستمر.</div>" },
+    { q: "Ali has been living here since he was a child. This means ........", options: ["Ali no longer lives here", "Ali lived here", "Ali lives here now", "Ali is a child"], answer: 2, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The present perfect continuous indicates that an action started in the past and is still continuing in the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> المضارع التام المستمر معناه إن الحدث بدأ في الماضي ولسه مكمل ومستمر لحد اللحظة دي، يعني هو لسه عايش هنا.</div>" },
+    { q: "Ali ........ school. He has just arrived home.", options: ["has been to", "has been in", "has gone to", "has been"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'has been to' means he went to a place and returned. Since he just arrived home, he has returned.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> طالما هو لسه واصل البيت، يبقى هو (راح ورجع). ودايماً (ذهب وعاد) بنعبر عنها بـ has been to.</div>" },
+    { q: "I haven't met the General Manager ........ It's my first time to meet him.", options: ["lately", "never", "already", "before"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> We use 'before' at the end of a negative present perfect sentence to talk about past experiences up to now.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التعبير عن حاجة محصلتش خالص قبل كده (دي أول مرة)، بنستخدم كلمة before في نهاية الجملة المنفية.</div>" },
+    { q: "Our block of flats ........ since last week.", options: ["have repainted", "has been repainted", "has repainted", "have been repainted"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The subject 'block' is singular, and the sentence is passive (the block receives the action of repainting).</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> العمارة (مفرد) وهتتدهن يعني الجملة مبنية للمجهول، فهنختار has been + P.P.</div>" },
+    { q: "Tamer said that he ........ English for four hours now.", options: ["has been studying", "was studying", "is studying", "had been studying"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The word 'now' in reported speech shows the action is still relevant/happening, preventing the shift to past perfect. Present perfect continuous is retained.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> وجود كلمة now بيمنع تحويل الزمن للماضي الأبعد، وبياكد إن الحدث لسه مستمر، عشان كده بنحتفظ بالمضارع التام المستمر.</div>" },
+    { q: "They started living here in 2015. This means ........", options: ["They have started live here since 2015", "They haven't lived here since 2015", "They have started living here since 2015", "They have lived here since 2015"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The verb 'start' isn't used with 'since' for states. We use the main state verb 'live' in the present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل start مبياخدش since، الصح إننا نستخدم الفعل الأساسي (live) في المضارع التام للتعبير عن بداية المعيشة.</div>" },
+    { q: "They have been to Luxor. This means ........", options: ["They are in Luxor.", "They aren't in Luxor now.", "They will go to Luxor someday.", "They have gone to Luxor."], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'have been to' means a person went to a place and has already returned.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التعبير (have been to) معناه إنهم راحوا الأقصر ورجعوا منها، يعني هما مش هناك دلوقتي.</div>" },
+    { q: "We ........ to the tennis club since we moved here.", options: ["have belonged", "have been belonging", "had belonged", "belonged"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'belong' is a stative verb (showing possession/state). It cannot be used in any continuous tense.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل belong (ينتمي لـ) من أفعال الحالة، ومينفعش يتحطله ing خالص، فبنختار المضارع التام البسيط.</div>" },
+    { q: "We've visited my parents every week since we ........ the car.", options: ["'ve had", "'ve been having", "had had", "are having"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The clause after 'since' can be present perfect if the state (owning the car) started in the past and continues to the present. 'have' is stative here.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الجملة بعد since ممكن تيجي مضارع تام لو الحالة دي لسه مستمرة (لسه عندهم العربية). وطبعاً have كفعل ملكية مبياخدش ing.</div>" },
+    { q: "There's not much more to do, now that we ........ the main problem.", options: ["have been solving", "have solved", "are solving", "were solving"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The action is completely finished with a current result (not much left to do). Simple present perfect is required.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الحدث خلص واكتمل (حلينا المشكلة) ونتيجته واضحة دلوقتي، عشان كده بنستخدم مضارع تام بسيط.</div>" },
+    { q: "I ........ all the museums in the city over the past five years.", options: ["have visited", "have been visiting", "visited", "am visiting"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> When the sentence mentions the quantity/completion of an action ('all the museums'), we must use the simple perfect, not continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> طالما الجملة حددت الكمية أو العدد اللي تم إنجازه (كل المتاحف)، يبقى لازم مضارع تام بسيط ومينفعش نحط مستمر.</div>" },
+    { q: "He has just gone out. This sentence means ........", options: ["He is going out now", "He went out a few minutes ago", "He goes out every day", "He will go out soon"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'has just + PP' (Present Perfect) is equivalent in meaning to past simple with 'a moment ago' or 'a few minutes ago'.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> تعبير (has just) معناه إن الحاجة لسه حاصلة حالاً، وبتساوي في المعنى الماضي البسيط مع كلمة (منذ لحظات).</div>" },
+    { q: "I've lived here ........ most of my life.", options: ["already", "since", "ever", "for"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'most of my life' is a period/duration of time, so we use 'for'.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> عبارة (معظم حياتي) بتعبر عن مدة زمنية استغرقها الحدث، وعشان كده بنستخدم for.</div>" },
+    { q: "Neither of the witnesses ........ their testimony yet, which has delayed the trial.", options: ["has completed", "have completed", "hasn't completed", "had completed"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'Neither of' takes a singular verb formally. The sentence is already negative in meaning, so we don't need 'hasn't'. 'yet' dictates present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> كلمة Neither بتدي معنى النفي فمش محتاجين نفي تاني. وبعدها بييجي فعل مفرد، ومع وجود yet هنختار has completed.</div>" },
+    { q: "With their win yesterday, Italy ........ into second place in the table.", options: ["was moving", "has moved", "has been moving", "had moved"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The focus is on the present result (being in second place now) of a recent past event (yesterday's win).</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التركيز هنا على النتيجة الحالية (إيطاليا في المركز التاني دلوقتي) بسبب حدث لسه حاصل، فبنختار مضارع تام.</div>" },
+    { q: "Sorry I haven't been able to see you. I ........ very hard.", options: ["had been working", "was working", "'ve worked", "'ve been working"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Providing an excuse for a present situation (haven't been able) by referencing a recently ongoing continuous activity.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> هو بيعتذر عن موقف حالي بسبب إنه كان مشغول ومستمر في الشغل جداً الفترة دي، الأنسب مضارع تام مستمر.</div>" },
+    { q: "She ........ him for 10 years, so they are good friends.", options: ["has known", "has been known", "has been knowing", "had known"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The verb 'know' is a stative verb. Stative verbs are not used in continuous tenses.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل know (يعرف) من أفعال الإدراك، ومينفعش ييجي في الاستمرار (ing) خالص، فبنختار تام بسيط.</div>" },
+    { q: "The doctors ........ many patients today.", options: ["treat", "have treated", "have been treated", "will treat"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Mentioning a quantity ('many patients') achieved in an unfinished time period ('today') requires present perfect simple.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما نذكر الكمية أو العدد اللي تم (مرضى كتير) في فترة لسه مخلصتش (النهاردة)، لازم نستخدم مضارع تام بسيط.</div>" },
+    { q: "Since I first met her, I ........ to ask her out all this time, but I'm too shy.", options: ["have tried", "have been trying", "tried", "was trying"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'all this time' strongly emphasizes the duration and continuous nature of the action up to the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> عبارة (all this time) بتركز جداً على استمرارية الحدث ومعاناته طول الوقت ده، فبنختار مضارع تام مستمر.</div>" },
+    { q: "Why are you so quiet? - Because I ........ about the exam.", options: ["am thinking", "think", "thinks", "was thinking"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The question 'Why are you so quiet?' asks about the current moment. The answer uses present continuous for an action happening right now.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> السؤال عن سبب هدوءه في اللحظة الحالية، والرد بيبين إنه بيفكر حالاً (فعل حركي مش حالة)، فبنختار مضارع مستمر.</div>" },
+    { q: "How many times ........ that movie?", options: ["have you been seeing", "you have been seeing", "have you been seen", "have you seen"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Questions starting with 'How many times' focus on the number of completed experiences, requiring simple present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> السؤال بـ (كم عدد المرات) بيركز على المرات اللي اكتمل فيها الحدث، فمبنستخدمش استمرار ونختار مضارع تام بسيط.</div>" }
+];
+
+let quizData = [];
+let currentQuestion = 0, userAnswers = {}, studentName = "", selectedAvatar = '🌌';
+let totalSeconds = 3600, qTimeLeft = 15, timerInterval = null, isTimeAttack = false;
+let isSubmitting = false; 
+
+// 🛡️ Silent Anti-Cheat
+let cheatWarnings = 0;
+const MAX_WARNINGS = 3;
+
+document.addEventListener("visibilitychange", () => {
+    const quizScreen = document.getElementById("quiz-screen");
+    if (document.hidden && quizScreen.style.display === "block" && !isSubmitting) {
+        cheatWarnings++;
+        if (cheatWarnings > MAX_WARNINGS) {
+            alert("🚨 SYSTEM OVERRIDE: تم سحب الورقة لعدم الالتزام ببروتوكول التركيز.");
+            calculateScore(); 
+        } else {
+            document.getElementById('cheat-msg').innerText = `تم رصد خروجك من النظام.\nالتحذير (${cheatWarnings} من ${MAX_WARNINGS}).\nفي المرة الرابعة سيتم سحب الورقة إجبارياً.`;
+            document.getElementById('cheat-modal').style.display = 'flex';
+            soundWrongTime();
+        }
+    }
+});
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U') || (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x'))) e.preventDefault();
+});
+document.addEventListener('copy', e => e.preventDefault()); document.addEventListener('paste', e => e.preventDefault()); document.addEventListener('cut', e => e.preventDefault());
+
+// 🔥 Shuffle Algorithm (Fisher-Yates)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function initQuizData() {
+    let tempArray = JSON.parse(JSON.stringify(rawData));
+    shuffleArray(tempArray); // Shuffle questions
+    
+    quizData = tempArray.map((item, index) => {
+        let correctText = item.options[item.answer];
+        shuffleArray(item.options); // Shuffle options
+        return {
+            originalQ: item.q,
+            q: `${index + 1}. ` + item.q.replace(/^\d+\.\s*/, ''),
+            options: item.options,
+            answer: item.options.indexOf(correctText),
+            exp: item.exp
+        };
+    });
+}
+
+function updateChromaShift() {
+    let levelIndex = Math.floor(currentQuestion / 5); 
+    if(levelIndex > 4) levelIndex = 4;
+    document.body.className = `theme-${levelIndex + 1}`;
+}
+
+function toggleTimeAttack() {
+    isTimeAttack = !isTimeAttack;
+    const btn = document.getElementById("time-attack-btn");
+    if(isTimeAttack) {
+        btn.classList.add("active"); btn.innerText = "⏳ وضع التحدي السريع (15ث): مُفعّل 🔥";
+    } else {
+        btn.classList.remove("active"); btn.innerText = "⏳ وضع التحدي السريع (15ث): متوقف";
+    }
+}
+
+function selectAvatar(el, avatar) {
+    document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected'); selectedAvatar = avatar;
+}
+
+function toggleTimerView() { document.getElementById("timer-text").classList.toggle("hidden-timer"); }
+
+function startQuiz() {
+    const input = document.getElementById("studentName").value.trim();
+    if (!input) { alert("أدخل هويتك لبدء المصفوفة!"); return; }
+    studentName = input; 
+    
+    initQuizData(); // Initialize and shuffle
+    
+    document.getElementById("start-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    document.getElementById("timer-container").style.display = "flex";
+    document.getElementById("eye-care-container").style.display = "flex";
+    
+    // 🟢 HUD Setup
+    document.getElementById("hud-avatar").innerText = selectedAvatar;
+    document.getElementById("hud-name").innerText = studentName;
+    document.getElementById("hud-moving-avatar").innerText = selectedAvatar;
+
+    startTimer(); loadQuestion();
+}
+
+let typeInterval;
+function loadQuestion() {
+    updateChromaShift();
+
+    if(isTimeAttack) { qTimeLeft = 15; document.getElementById("timer-box").classList.remove("danger"); }
+
+    const item = quizData[currentQuestion];
+    const optionsList = document.getElementById("options-list");
+    
+    clearInterval(typeInterval);
+    optionsList.classList.remove("show-options");
+    optionsList.innerHTML = "";
+
+    item.options.forEach((opt, oIndex) => {
+        const div = document.createElement("div"); div.className = "option-item";
+        if (userAnswers[currentQuestion] === oIndex) div.classList.add("selected");
+        const letter = String.fromCharCode(65 + oIndex);
+        div.innerHTML = `<div class="opt-letter">${letter}</div> <div class="opt-text" style="direction: ltr;">${opt}</div>`;
+        div.onclick = () => selectOption(oIndex);
+        optionsList.appendChild(div);
+    });
+
+    // Removed Cinema Mode entirely. Just instant text display for full protection.
+    document.getElementById("question-text-content").innerText = item.q;
+    optionsList.classList.add("show-options");
+
+    // ⚡ English Progress & Avatar Runner
+    document.getElementById("progress-count").innerText = `Q: ${currentQuestion + 1} / ${quizData.length}`;
+    document.getElementById("energy-bar").style.width = `${Math.round(((currentQuestion + 1) / quizData.length) * 100)}%`;
+
+    document.getElementById("prev-btn").disabled = currentQuestion === 0;
+    if(isTimeAttack) document.getElementById("prev-btn").style.display = "none";
+
+    document.getElementById("next-btn").style.display = (currentQuestion === quizData.length - 1) ? "none" : "inline-flex";
+    document.getElementById("submit-btn").style.display = (currentQuestion === quizData.length - 1) ? "inline-flex" : "none";
+}
+
+function selectOption(oIndex) {
+    userAnswers[currentQuestion] = oIndex;
+    const optionsList = document.getElementById("options-list");
+    Array.from(optionsList.children).forEach((child, i) => {
+        if(i === oIndex) child.classList.add("selected"); else child.classList.remove("selected");
+    });
+}
+
+function nextQuestion(force = false) {
+    if (!force && userAnswers[currentQuestion] === undefined) { alert("لازم تختار إجابة الأول عشان تكمل!"); return; }
+    if (currentQuestion < quizData.length - 1) { 
+        currentQuestion++;
+        if (currentQuestion % 4 === 0 && currentQuestion !== 0) triggerTeacherCheer();
+        loadQuestion();
+    }
+}
+
+function prevQuestion() { if (currentQuestion > 0) { currentQuestion--; loadQuestion(); } }
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        if(isTimeAttack) {
+            qTimeLeft--;
+            document.getElementById("timer-text").innerText = `00:${qTimeLeft<10?'0'+qTimeLeft:qTimeLeft}`;
+            if (qTimeLeft <= 5) {
+                document.getElementById("timer-box").classList.add("danger");
+                document.getElementById("app-container").classList.add("shake-active");
+                setTimeout(()=> document.getElementById("app-container").classList.remove("shake-active"), 400);
+            } else { document.getElementById("timer-box").classList.remove("danger"); }
+            
+            // 🚨 Time Attack Force Next
+            if (qTimeLeft <= 0) {
+                if(userAnswers[currentQuestion] === undefined) { userAnswers[currentQuestion] = -1; }
+                if(currentQuestion < quizData.length - 1) {
+                    nextQuestion(true);
+                } else {
+                    calculateScore(); 
+                }
+            }
+        } else {
+            totalSeconds--;
+            let m = Math.floor(totalSeconds / 60), s = totalSeconds % 60;
+            document.getElementById("timer-text").innerText = `${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+            if (totalSeconds <= 300) document.getElementById("timer-box").classList.add("danger");
+            if (totalSeconds <= 0) { clearInterval(timerInterval); calculateScore(); }
+        }
+    }, 1000);
+}
+
+// 🟢 Direct Submit Function 
+function calculateScore() {
+    if(isSubmitting) return; 
+    isSubmitting = true;
+
+    try {
+        clearInterval(timerInterval);
+        
+        document.getElementById("quiz-screen").style.display = "none";
+        document.getElementById("timer-container").style.display = "none";
+        document.getElementById("eye-care-container").style.display = "none";
+        document.getElementById("result-screen").style.display = "block";
+        window.scroll({ top: 0, left: 0 });
+
+        let score = 0; const reviewList = document.getElementById("review-list"); 
+        if(reviewList) reviewList.innerHTML = "";
+
+        quizData.forEach((item, index) => {
+            const isCorrect = userAnswers[index] === item.answer;
+            if (isCorrect) score++;
+            
+            let userOptText = "لم يتم الحل ❌";
+            if (userAnswers[index] !== undefined && userAnswers[index] !== -1) userOptText = item.options[userAnswers[index]];
+            const correctOpt = item.options[item.answer];
+
+            const div = document.createElement("div");
+            div.className = `review-item ${isCorrect ? 'is-correct is-correct-item' : 'is-wrong is-wrong-item'}`;
+            div.innerHTML = `<div style="font-weight:800;font-size:16px;margin-bottom:8px; direction: ltr; color: var(--text-main);">${item.q}</div>
+                <div style="direction: rtl; color: var(--text-muted);">إجابتك: <b style="color:${isCorrect?'var(--success-color)':'var(--error-color)'}; direction: ltr; display: inline-block;">${userOptText}</b></div>
+                ${!isCorrect ? `<div style="color:var(--success-color);font-weight:800;margin-top:4px; direction: rtl;">الإجابة الصحيحة: <span style="direction: ltr; display: inline-block;">${correctOpt}</span></div>` : ''}
+                <div class="explanation-box">${item.exp}</div>`;
+            if(reviewList) reviewList.appendChild(div);
+        });
+
+        const percent = Math.round((score / quizData.length) * 100);
+        window.finalScore = score; window.finalPercent = percent;
+
+        document.body.className = "theme-5"; 
+        
+        // 🟢 Result display Setup
+        document.getElementById("student-display-name").innerHTML = `<span class="result-avatar">${selectedAvatar}</span> ${studentName}`;
+        document.getElementById("score-percentage").innerText = `${score} / ${quizData.length}`;
+        document.getElementById("score-percent-text").innerText = `Accuracy: ${percent}%`;
+        
+        let modTxt = isTimeAttack ? " (Time Attack 🔥)" : "";
+        document.getElementById("score-details").innerText = `تم إنهاء التقييم بنجاح! ${modTxt}`;
+
+        let badge = percent >= 90 ? "👑 النخبة (Elite)" : percent >= 75 ? "🔥 أداء متميز (Pro)" : "🌱 محاولة مبشرة (Challenger)";
+        document.getElementById("badge-award-box").innerText = badge;
+        
+        if (percent >= 80) document.getElementById("cert-btn").style.display = "inline-flex";
+
+        setTimeout(() => {
+            try { soundBossWin(); } catch(e){}
+            try { initScratchCard(); } catch(e){}
+            try {
+                let confColor = getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#FFD700';
+                if (percent >= 80 && typeof confetti === 'function') confetti({ particleCount: 300, spread: 150, origin: { y: 0.6 }, colors: ['#0B0C10', confColor, '#FFFFFF'] });
+            } catch(e){}
+            
+            try {
+                if(typeof emailjs !== 'undefined') {
+                    let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + "s";
+                    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                        quiz_name: "Quantum Matrix",
+                        student_name: studentName, 
+                        score: `${score}/${quizData.length}`, 
+                        percentage: `${percent}%`, 
+                        time_taken: usedTime,
+                        date_time: new Date().toLocaleString('ar-EG')
+                    });
+                }
+            } catch(e){}
+        }, 100);
+
+    } catch(e) { console.error("Error:", e); alert("حدث خطأ تقني أثناء معالجة النتيجة."); }
+}
+
+function shareToParentWhatsApp() {
+    let txt = `👨‍👩‍👧 تقرير أداء - Quantum Matrix\n👤 الطالب: ${studentName}\n📊 النسبة: ${finalPercent}%\n✨ تحت إشراف مستر أيمن كامل.`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+function shareToTeacherWhatsApp() {
+    let txt = `👨‍🏫 تقرير تسليم - Quantum Matrix\n👤 الطالب: ${studentName}\n🎯 الدرجة: ${finalScore} / ${quizData.length}\n📊 النسبة: ${finalPercent}%`;
+    window.open(`https://wa.me/201284749899?text=${encodeURIComponent(txt)}`, '_blank');
+}
+function sharePeerChallenge() {
+    let txt = `🔥 أنا جبت ${finalPercent}% في تحدي الكوانتم لمستر أيمن كامل! تقدر تكسر السكور بتاعي؟ 🚀`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+function downloadSmartRevision() {
+    document.body.classList.add('print-errors-only');
+    window.print();
+    setTimeout(() => { document.body.classList.remove('print-errors-only'); }, 500);
+}
+
+function downloadCertificate() {
+    const canvas = document.createElement('canvas'); canvas.width = 1000; canvas.height = 700; const ctx = canvas.getContext('2d');
+    let accent = getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#FFD700';
+
+    ctx.fillStyle = '#07090F'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.save(); ctx.translate(canvas.width / 2, canvas.height / 2); ctx.rotate(-Math.PI / 6);
+    ctx.globalAlpha = 0.05; ctx.font = "bold 110px 'Outfit'"; ctx.fillStyle = accent;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("MR. AYMAN KAMEL", 0, -60); ctx.fillText("MATRIX ELITE", 0, 70); ctx.restore();
+
+    ctx.strokeStyle = accent; ctx.lineWidth = 10; ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+    ctx.globalAlpha = 0.4; ctx.lineWidth = 3; ctx.strokeRect(42, 42, canvas.width - 84, canvas.height - 84); ctx.globalAlpha = 1.0;
+
+    ctx.textAlign = "center"; ctx.fillStyle = accent; ctx.font = "bold 45px 'Outfit'";
+    ctx.fillText("🌌 Certificate of Cyber Mastery 🌌", canvas.width / 2, 120);
+
+    ctx.fillStyle = "#94A3B8"; ctx.font = "30px 'Outfit'";
+    ctx.fillText("This classified document is awarded to the elite student:", canvas.width / 2, 220);
+
+    ctx.fillStyle = "#FFFFFF"; ctx.font = "bold 65px 'Cairo'";
+    ctx.fillText(studentName, canvas.width / 2, 320);
+
+    ctx.fillStyle = "#94A3B8"; ctx.font = "25px 'Outfit'";
+    ctx.fillText(`For successfully bypassing the Matrix with an accuracy of`, canvas.width / 2, 420);
+
+    ctx.fillStyle = "#10B981"; ctx.font = "bold 55px 'Outfit'";
+    ctx.fillText(`${finalScore} / ${quizData.length}  (${finalPercent}%)`, canvas.width / 2, 500);
+
+    ctx.fillStyle = accent; ctx.font = "22px 'Outfit'";
+    ctx.fillText("System Architect: Mr. Ayman Kamel", canvas.width / 2, 600);
+    
+    let d = new Date(); ctx.font = "18px 'Outfit'";
+    ctx.fillText("Bypass Date: " + d.toLocaleDateString('en-GB'), canvas.width / 2, 640);
+
+    ctx.globalAlpha = 0.6; ctx.textAlign = "left"; ctx.font = "16px 'Outfit'";
+    ctx.fillText("ID: MTX-" + d.getFullYear() + "-" + Math.floor(Math.random()*90000+10000), 55, 655);
+    ctx.globalAlpha = 1.0;
+
+    const link = document.createElement('a'); link.download = `Matrix_Mastery_${studentName}.png`;
+    link.href = canvas.toDataURL('image/png'); link.click();
+}
+</script>
+</body>
+</html>
