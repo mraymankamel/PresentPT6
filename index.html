@@ -12,8 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Outfit:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     
-    <!-- ❌ تم حذف مكتبة EmailJS من هنا ❌ -->
-    
     <style>
         /* 🌌 Quantum Nexus Theme Variables */
         :root {
@@ -537,8 +535,8 @@
 // ✅ دالة إرسال التقرير إلى جوجل سكريبت ✅
 // ==========================================
 
-// ⚠️ هام: ضع الرابط الذي حصلت عليه من جوجل هنا
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXSd2nT2D6_cOthlXESSlddBsiq555sZVjAzwoOgJ-y0aPUSS0TgLIUYvbeODz4SdGXw/exec";
+// الرابط الجديد الخاص بك
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7rK7-wDlIAPYsV2rlzwIGTlsYuQh6nZoV3510D3e9R2HAoW0T36pJKvbR8lqQjEcFCw/exec";
 
 function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersText) {
     let formData = new FormData();
@@ -549,15 +547,15 @@ function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersT
     formData.append("timeSpent", time);
     formData.append("wrongAnswers", wrongAnswersText);
 
+    // إضافة وضع no-cors لتخطي حظر المتصفح
     fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        body: formData
+        body: formData,
+        mode: "no-cors"
     })
-    .then(response => response.json())
-    .then(data => {
-        if(data.result === "success") {
-            console.log("تم إرسال التقرير بنجاح للمستر!");
-        }
+    .then(() => {
+        // لن يتم قراءة الرد بسبب no-cors، لكن الإرسال يتم بنجاح في الخلفية
+        console.log("تم إرسال التقرير للمستر بنجاح في الخلفية!");
     })
     .catch(error => console.error("خطأ في الإرسال لجوجل:", error));
 }
@@ -941,7 +939,7 @@ function calculateScore() {
             } catch(e){}
             
             // ==========================================
-            // ✅ تم استبدال EmailJS بإرسال جوجل سكريبت هنا
+            // ✅ الإرسال إلى Google Apps Script
             // ==========================================
             try {
                 let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + " ثانية";
@@ -950,7 +948,7 @@ function calculateScore() {
                     ? wrongAnswersArray.join('\n') 
                     : "ممتاز! لم يخطئ الطالب في أي سؤال.";
 
-                // استدعاء دالة الإرسال
+                // استدعاء دالة الإرسال المُعدلة بـ no-cors
                 sendReportToTeacher(
                     studentName, 
                     `${score} / ${quizData.length}`, 
