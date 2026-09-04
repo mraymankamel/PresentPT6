@@ -521,9 +521,10 @@
 
 <script>
 // ==========================================
-// ✅ الرابط الخاص بك
+// ✅ دالة إرسال التقرير الشامل إلى جوجل سكريبت 
 // ==========================================
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwL7SEHMEd4FBqOW1SHeNYVfXn98bsg3hspdXYPh6TTCJjJIr9GdpcKyKMbMyxoZlfZ/exec";
+
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxps3pkSIfSFL8rwhCNMlNCEYkeL2ooxYo_6WgWRXHHL0hcY0owu-x0qRtZei0migOyxg/exec";
 
 function sendReportToTeacher(examName, name, finalScore, finalPercent, time, wrongAnswersText, warningsCount, weakestSkill) {
     let params = new URLSearchParams();
@@ -620,7 +621,20 @@ function triggerTeacherCheer() {
     wrapper.classList.add("show"); setTimeout(() => { wrapper.classList.remove("show"); }, 3500);
 }
 
-// 🎯 تم إضافة (rule) لكل سؤال ليقوم النظام بتحليل أضعف قاعدة للطالب 
+let logoClicks = 0, logoClickTimer;
+function triggerEasterEgg() {
+    logoClicks++; clearTimeout(logoClickTimer);
+    logoClickTimer = setTimeout(() => { logoClicks = 0; }, 1500);
+    if(logoClicks >= 5) { soundEasterEgg(); alert("⚡ Quantum Matrix Easter Egg Found! ⚡"); logoClicks = 0; }
+}
+
+function changeFontSize(change) {
+    const root = document.documentElement;
+    let currentSize = parseInt(getComputedStyle(root).getPropertyValue('--q-font-size')) || 22;
+    let newSize = currentSize + change;
+    if(newSize >= 16 && newSize <= 30) { root.style.setProperty('--q-font-size', newSize + 'px'); }
+}
+
 const rawData = [
     { rule: "Present Perfect Continuous", q: "He's out of breath because he ........", options: ["was running", "had run", "has run", "has been running"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Present physical evidence (out of breath) of a continuous action that just stopped. We use present perfect continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما يكون فيه أثر بدني واضح في الحاضر (بينهج) لحدث كان مستمر وخلص للتو (الجري)، بنستخدم مضارع تام مستمر.</div>" },
     { rule: "Present Perfect Continuous", q: "Ali has been living here since he was a child. This means ........", options: ["Ali no longer lives here", "Ali lived here", "Ali lives here now", "Ali is a child"], answer: 2, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The present perfect continuous indicates that an action started in the past and is still continuing in the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> المضارع التام المستمر معناه إن الحدث بدأ في الماضي ولسه مكمل ومستمر لحد اللحظة دي، يعني هو لسه عايش هنا.</div>" },
@@ -916,7 +930,7 @@ function calculateScore() {
                     ? wrongAnswersArray.join('') 
                     : "<p style='text-align:center; font-weight:bold; color:#10B981; font-size: 16px;'>Excellent! The student made zero mistakes. 🎉</p>";
 
-                let examTitle = "Quantum Matrix Challenge"; // ⚠️ عنوان الامتحان
+                let examTitle = "Quantum Matrix Challenge"; 
 
                 sendReportToTeacher(
                     examTitle,
