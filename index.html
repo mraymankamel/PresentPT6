@@ -524,7 +524,7 @@
 // ✅ دالة إرسال التقرير إلى جوجل سكريبت 
 // ==========================================
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOJsumt2iWlLFQeBRQfHBYDw-YxZSwQuA4mYZBzTmFBExIjNFNXLjmWpoyx_-jHeiIxA/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxE8VCuunr_aOv9RCrFm_zJPUnoBt_mYA0ony3oXSqEQzrIwgDVwgNi1zRQG2KdXzGONw/exec";
 
 function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersText) {
     let params = new URLSearchParams();
@@ -549,7 +549,6 @@ function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersT
     .catch(error => console.error("خطأ:", error));
 }
 // ==========================================
-
 
 function tryVibrate(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch(e){} } }
 
@@ -870,22 +869,40 @@ function calculateScore() {
             const isCorrect = userAnswers[index] === item.answer;
             if (isCorrect) score++;
             
-            let userOptText = "لم يتم الحل ❌";
-            if (userAnswers[index] !== undefined && userAnswers[index] !== -1) userOptText = item.options[userAnswers[index]];
+            let uiUserOptText = "لم يتم الحل ❌";
+            let emailUserOptText = "Not answered ❌";
+            
+            if (userAnswers[index] !== undefined && userAnswers[index] !== -1) {
+                uiUserOptText = item.options[userAnswers[index]];
+                emailUserOptText = item.options[userAnswers[index]];
+            }
+            
             const correctOpt = item.options[item.answer];
 
+            // ⚠️ تنسيق احترافي للأخطاء في الإيميل بالإنجليزية مع دمج التفسير المزدوج
             if (!isCorrect) {
+                let emailExplanation = item.exp
+                    .replace(/class='exp-en'/g, "style='direction: ltr; text-align: left; color: #555; font-size: 14px; margin-bottom: 8px;'")
+                    .replace(/class='exp-separator'/g, "style='width: 100%; height: 1px; border-bottom: 1px dashed #ccc; margin: 8px 0;'")
+                    .replace(/class='exp-ar'/g, "style='direction: rtl; text-align: right; color: #000080; font-family: Tahoma, Arial, sans-serif; font-size: 14px; font-weight: bold; margin-top: 8px;'");
+
                 wrongAnswersArray.push(
-                    `السؤال ${index + 1}: ${item.originalQ}\n` +
-                    `❌ إجابة الطالب: ${userOptText}\n` +
-                    `✅ الإجابة الصحيحة: ${correctOpt}\n`
+                    `<div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0;">` +
+                        `<div style="direction: ltr; text-align: left; font-weight: bold; color: #000080; margin-bottom: 8px; font-size: 16px;">Q${index + 1}: ${item.originalQ}</div>` +
+                        `<div style="direction: ltr; text-align: left; color: #F43F5E; font-size: 15px; margin-bottom: 4px;">❌ <b>Student's Answer:</b> ${emailUserOptText}</div>` +
+                        `<div style="direction: ltr; text-align: left; color: #10B981; font-size: 15px; margin-bottom: 10px;">✅ <b>Correct Answer:</b> ${correctOpt}</div>` +
+                        `<div style="background: rgba(0,0,0,0.04); padding: 12px; border-radius: 6px; border-left: 4px solid #FFD700;">` +
+                            emailExplanation + 
+                        `</div>` +
+                    `</div>`
                 );
             }
 
+            // واجهة الطالب بعد انتهاء الامتحان (تبقى باللغة العربية كما طلبت)
             const div = document.createElement("div");
             div.className = `review-item ${isCorrect ? 'is-correct is-correct-item' : 'is-wrong is-wrong-item'}`;
             div.innerHTML = `<div style="font-weight:800;font-size:16px;margin-bottom:8px; direction: ltr; color: var(--text-main);">${item.q}</div>
-                <div style="direction: rtl; color: var(--text-muted);">إجابتك: <b style="color:${isCorrect?'var(--success-color)':'var(--error-color)'}; direction: ltr; display: inline-block;">${userOptText}</b></div>
+                <div style="direction: rtl; color: var(--text-muted);">إجابتك: <b style="color:${isCorrect?'var(--success-color)':'var(--error-color)'}; direction: ltr; display: inline-block;">${uiUserOptText}</b></div>
                 ${!isCorrect ? `<div style="color:var(--success-color);font-weight:800;margin-top:4px; direction: rtl;">الإجابة الصحيحة: <span style="direction: ltr; display: inline-block;">${correctOpt}</span></div>` : ''}
                 <div class="explanation-box">${item.exp}</div>`;
             if(reviewList) reviewList.appendChild(div);
@@ -917,10 +934,10 @@ function calculateScore() {
             } catch(e){}
             
             try {
-                let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + " ثانية";
+                let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + " Seconds";
                 let wrongAnswersText = wrongAnswersArray.length > 0 
-                    ? wrongAnswersArray.join('\n') 
-                    : "ممتاز! لم يخطئ الطالب في أي سؤال.";
+                    ? wrongAnswersArray.join('') 
+                    : "<p style='text-align:center; font-weight:bold; color:#10B981; font-size: 16px;'>Excellent! The student made zero mistakes. 🎉</p>";
 
                 sendReportToTeacher(
                     studentName, 
