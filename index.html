@@ -531,7 +531,8 @@ function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersT
     params.append("studentName", name);
     params.append("score", finalScore);
     params.append("percentage", finalPercent);
-    params.append("date", new Date().toLocaleString('ar-EG'));
+    // تم تعديل التنسيق إلى en-GB لتظهر باللغة الإنجليزية كما طلبت
+    params.append("date", new Date().toLocaleString('en-GB'));
     params.append("timeSpent", time);
     params.append("wrongAnswers", wrongAnswersText);
 
@@ -898,7 +899,7 @@ function calculateScore() {
                 );
             }
 
-            // واجهة الطالب بعد انتهاء الامتحان (تبقى باللغة العربية كما طلبت)
+            // واجهة الطالب بعد انتهاء الامتحان
             const div = document.createElement("div");
             div.className = `review-item ${isCorrect ? 'is-correct is-correct-item' : 'is-wrong is-wrong-item'}`;
             div.innerHTML = `<div style="font-weight:800;font-size:16px;margin-bottom:8px; direction: ltr; color: var(--text-main);">${item.q}</div>
