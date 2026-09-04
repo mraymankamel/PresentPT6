@@ -535,8 +535,7 @@
 // ✅ دالة إرسال التقرير إلى جوجل سكريبت ✅
 // ==========================================
 
-// الرابط الجديد الخاص بك
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7rK7-wDlIAPYsV2rlzwIGTlsYuQh6nZoV3510D3e9R2HAoW0T36pJKvbR8lqQjEcFCw/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPG1PRT-pDmDQ8_bqlOoD-NvZ9mpEJ6RaECitTESfmblrDEIlx08BSYub1pnuSIIKe5Q/exec";
 
 function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersText) {
     let formData = new FormData();
@@ -547,17 +546,16 @@ function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersT
     formData.append("timeSpent", time);
     formData.append("wrongAnswers", wrongAnswersText);
 
-    // إضافة وضع no-cors لتخطي حظر المتصفح
     fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: formData,
-        mode: "no-cors"
+        mode: "no-cors" // هذا الأمر يحل مشكلة حماية المتصفحات
     })
     .then(() => {
-        // لن يتم قراءة الرد بسبب no-cors، لكن الإرسال يتم بنجاح في الخلفية
-        console.log("تم إرسال التقرير للمستر بنجاح في الخلفية!");
+        // سيتم الإرسال بنجاح في صمت
+        console.log("تم إرسال التقرير بنجاح في الخلفية!");
     })
-    .catch(error => console.error("خطأ في الإرسال لجوجل:", error));
+    .catch(error => console.error("خطأ في الإرسال:", error));
 }
 // ==========================================
 
@@ -939,7 +937,7 @@ function calculateScore() {
             } catch(e){}
             
             // ==========================================
-            // ✅ الإرسال إلى Google Apps Script
+            // ✅ تم استبدال EmailJS بإرسال جوجل سكريبت هنا
             // ==========================================
             try {
                 let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + " ثانية";
@@ -948,7 +946,7 @@ function calculateScore() {
                     ? wrongAnswersArray.join('\n') 
                     : "ممتاز! لم يخطئ الطالب في أي سؤال.";
 
-                // استدعاء دالة الإرسال المُعدلة بـ no-cors
+                // استدعاء دالة الإرسال مع تفعيل no-cors
                 sendReportToTeacher(
                     studentName, 
                     `${score} / ${quizData.length}`, 
