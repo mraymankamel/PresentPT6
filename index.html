@@ -407,7 +407,6 @@
 
 <div class="main-container" id="app-container">
     <header>
-        <!-- ⏱️ Timer (Left) & Eye Icon (Right of Timer) -->
         <div class="time-controls" id="timer-container" style="display: none;">
             <div class="timer-box" id="timer-box"><div class="time-dot"></div><span id="timer-text">60:00</span></div>
             <button type="button" class="icon-btn" id="btn-timer-view" onclick="toggleTimerView()" title="إخفاء الوقت">⏱️</button>
@@ -418,7 +417,6 @@
             <button type="button" class="icon-btn" onclick="changeFontSize(-2)" title="تصغير الخط">A-</button>
         </div>
 
-        <!-- 🧠 Cheer Bubble -->
         <div class="cheer-wrapper" id="cheer-wrapper">
             <div class="cheer-bubble">
                 <img src="https://lh3.googleusercontent.com/d/1BqwA44F0BAwWMSwBnBeDIkfkNgBEtif-" alt="Mr. Ayman Kamel">
@@ -429,7 +427,6 @@
             </div>
         </div>
 
-        <!-- Branding -->
         <img src="https://lh3.googleusercontent.com/d/1BqwA44F0BAwWMSwBnBeDIkfkNgBEtif-" alt="Mr. Ayman Kamel Logo" onclick="triggerEasterEgg()">
         <h1>Mr. Ayman Kamel</h1>
         <p class="job-title">English Language Educator</p>
@@ -457,12 +454,10 @@
             <div class="input-group">
                 <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي عشان نبدأ..." autocomplete="off" onkeypress="if(event.key === 'Enter') startQuiz()">
             </div>
-            <!-- Start Button (English) -->
             <button type="button" class="btn btn-solid" style="width:100%" onclick="startQuiz()">START ASSESSMENT ➔</button>
         </div>
 
         <div id="quiz-screen">
-            <!-- ⚡ HUD Progress Bar -->
             <div class="hud-progress-wrapper">
                 <div class="hud-stats">
                     <div class="hud-student">
@@ -472,14 +467,12 @@
                 </div>
                 <div class="hud-bar-container">
                     <div class="hud-bar-fill" id="energy-bar">
-                        <!-- 🏃‍♂️ Moving Avatar -->
                         <div class="hud-avatar-runner" id="hud-moving-avatar">🌌</div>
                     </div>
                 </div>
             </div>
 
             <div class="station-card" id="q-box">
-                <!-- 🔊 TTS Button Middle Right strictly -->
                 <div class="question-text">
                     <div class="question-text-wrapper">
                         <span id="question-text-content">--</span><span class="cursor" id="typing-cursor" style="display:none;"></span>
@@ -492,20 +485,16 @@
             </div>
 
             <div class="action-btns">
-                <!-- Navigation Buttons (English) -->
                 <button type="button" class="btn btn-prev" id="prev-btn" onclick="prevQuestion()" disabled>⬅ PREV</button>
                 <button type="button" class="btn btn-solid" id="next-btn" onclick="nextQuestion()">NEXT ➔</button>
-                <!-- 🚀 Direct Submit Button -->
                 <button type="button" class="btn btn-solid" id="submit-btn" onclick="calculateScore()" style="display: none;">🚀 SUBMIT</button>
             </div>
         </div>
 
         <div id="result-screen">
             <div class="score-card">
-                <!-- 🏆 Giant LTR Score Circle -->
                 <div class="score-circle" id="score-percentage">0 / 0</div>
                 <div id="score-percent-text">Accuracy: 0%</div>
-                <!-- Student Name with Avatar Perfect Circle -->
                 <h2 id="student-display-name"></h2>
                 
                 <div class="scratch-container">
@@ -532,30 +521,32 @@
 
 <script>
 // ==========================================
-// ✅ دالة إرسال التقرير إلى جوجل سكريبت ✅
+// ✅ دالة إرسال التقرير إلى جوجل سكريبت 
 // ==========================================
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPG1PRT-pDmDQ8_bqlOoD-NvZ9mpEJ6RaECitTESfmblrDEIlx08BSYub1pnuSIIKe5Q/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOJsumt2iWlLFQeBRQfHBYDw-YxZSwQuA4mYZBzTmFBExIjNFNXLjmWpoyx_-jHeiIxA/exec";
 
 function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersText) {
-    let formData = new FormData();
-    formData.append("studentName", name);
-    formData.append("score", finalScore);
-    formData.append("percentage", finalPercent);
-    formData.append("date", new Date().toLocaleString('ar-EG'));
-    formData.append("timeSpent", time);
-    formData.append("wrongAnswers", wrongAnswersText);
+    let params = new URLSearchParams();
+    params.append("studentName", name);
+    params.append("score", finalScore);
+    params.append("percentage", finalPercent);
+    params.append("date", new Date().toLocaleString('ar-EG'));
+    params.append("timeSpent", time);
+    params.append("wrongAnswers", wrongAnswersText);
 
     fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        body: formData,
-        mode: "no-cors" // هذا الأمر يحل مشكلة حماية المتصفحات
+        body: params,
+        mode: "no-cors", 
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
     })
     .then(() => {
-        // سيتم الإرسال بنجاح في صمت
-        console.log("تم إرسال التقرير بنجاح في الخلفية!");
+        console.log("تم إرسال التقرير بنجاح للمستر!");
     })
-    .catch(error => console.error("خطأ في الإرسال:", error));
+    .catch(error => console.error("خطأ:", error));
 }
 // ==========================================
 
@@ -618,7 +609,6 @@ function initScratchCard() {
     canvas.onmousemove = scratch; canvas.ontouchmove = scratch;
 }
 
-// 🧠 Egyptian Slang Cheers 
 const cheers = [
     {en: "🚀 Keep pushing forward!", ar: "عاش يا وحش، كمل في طريقك!"},
     {en: "🧠 Stay focused!", ar: "الله ينور، تركيزك عالي جداً!"},
@@ -654,7 +644,6 @@ function changeFontSize(change) {
     if(newSize >= 16 && newSize <= 30) { root.style.setProperty('--q-font-size', newSize + 'px'); }
 }
 
-// 📚 Data Array
 const rawData = [
     { q: "He's out of breath because he ........", options: ["was running", "had run", "has run", "has been running"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Present physical evidence (out of breath) of a continuous action that just stopped. We use present perfect continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما يكون فيه أثر بدني واضح في الحاضر (بينهج) لحدث كان مستمر وخلص للتو (الجري)، بنستخدم مضارع تام مستمر.</div>" },
     { q: "Ali has been living here since he was a child. This means ........", options: ["Ali no longer lives here", "Ali lived here", "Ali lives here now", "Ali is a child"], answer: 2, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The present perfect continuous indicates that an action started in the past and is still continuing in the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> المضارع التام المستمر معناه إن الحدث بدأ في الماضي ولسه مكمل ومستمر لحد اللحظة دي، يعني هو لسه عايش هنا.</div>" },
@@ -685,7 +674,6 @@ let currentQuestion = 0, userAnswers = {}, studentName = "", selectedAvatar = '�
 let totalSeconds = 3600, qTimeLeft = 15, timerInterval = null, isTimeAttack = false;
 let isSubmitting = false; 
 
-// 🛡️ Silent Anti-Cheat
 let cheatWarnings = 0;
 const MAX_WARNINGS = 3;
 
@@ -709,7 +697,6 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('copy', e => e.preventDefault()); document.addEventListener('paste', e => e.preventDefault()); document.addEventListener('cut', e => e.preventDefault());
 
-// 🔥 Shuffle Algorithm (Fisher-Yates)
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -719,11 +706,11 @@ function shuffleArray(array) {
 
 function initQuizData() {
     let tempArray = JSON.parse(JSON.stringify(rawData));
-    shuffleArray(tempArray); // Shuffle questions
+    shuffleArray(tempArray); 
     
     quizData = tempArray.map((item, index) => {
         let correctText = item.options[item.answer];
-        shuffleArray(item.options); // Shuffle options
+        shuffleArray(item.options); 
         return {
             originalQ: item.q,
             q: `${index + 1}. ` + item.q.replace(/^\d+\.\s*/, ''),
@@ -762,14 +749,13 @@ function startQuiz() {
     if (!input) { alert("أدخل هويتك لبدء المصفوفة!"); return; }
     studentName = input; 
     
-    initQuizData(); // Initialize and shuffle
+    initQuizData(); 
     
     document.getElementById("start-screen").style.display = "none";
     document.getElementById("quiz-screen").style.display = "block";
     document.getElementById("timer-container").style.display = "flex";
     document.getElementById("eye-care-container").style.display = "flex";
     
-    // 🟢 HUD Setup
     document.getElementById("hud-avatar").innerText = selectedAvatar;
     document.getElementById("hud-name").innerText = studentName;
     document.getElementById("hud-moving-avatar").innerText = selectedAvatar;
@@ -802,7 +788,6 @@ function loadQuestion() {
     document.getElementById("question-text-content").innerText = item.q;
     optionsList.classList.add("show-options");
 
-    // ⚡ English Progress & Avatar Runner
     document.getElementById("progress-count").innerText = `Q: ${currentQuestion + 1} / ${quizData.length}`;
     document.getElementById("energy-bar").style.width = `${Math.round(((currentQuestion + 1) / quizData.length) * 100)}%`;
 
@@ -844,7 +829,6 @@ function startTimer() {
                 setTimeout(()=> document.getElementById("app-container").classList.remove("shake-active"), 400);
             } else { document.getElementById("timer-box").classList.remove("danger"); }
             
-            // 🚨 Time Attack Force Next
             if (qTimeLeft <= 0) {
                 if(userAnswers[currentQuestion] === undefined) { userAnswers[currentQuestion] = -1; }
                 if(currentQuestion < quizData.length - 1) {
@@ -863,7 +847,6 @@ function startTimer() {
     }, 1000);
 }
 
-// 🟢 Direct Submit Function 
 function calculateScore() {
     if(isSubmitting) return; 
     isSubmitting = true;
@@ -881,7 +864,6 @@ function calculateScore() {
         const reviewList = document.getElementById("review-list"); 
         if(reviewList) reviewList.innerHTML = "";
 
-        // مصفوفة لحفظ الأسئلة الخاطئة
         let wrongAnswersArray = [];
 
         quizData.forEach((item, index) => {
@@ -892,7 +874,6 @@ function calculateScore() {
             if (userAnswers[index] !== undefined && userAnswers[index] !== -1) userOptText = item.options[userAnswers[index]];
             const correctOpt = item.options[item.answer];
 
-            // ⚠️ حفظ الأخطاء لإرسالها في التقرير
             if (!isCorrect) {
                 wrongAnswersArray.push(
                     `السؤال ${index + 1}: ${item.originalQ}\n` +
@@ -915,7 +896,6 @@ function calculateScore() {
 
         document.body.className = "theme-5"; 
         
-        // 🟢 Result display Setup
         document.getElementById("student-display-name").innerHTML = `<span class="result-avatar">${selectedAvatar}</span> ${studentName}`;
         document.getElementById("score-percentage").innerText = `${score} / ${quizData.length}`;
         document.getElementById("score-percent-text").innerText = `Accuracy: ${percent}%`;
@@ -936,17 +916,12 @@ function calculateScore() {
                 if (percent >= 80 && typeof confetti === 'function') confetti({ particleCount: 300, spread: 150, origin: { y: 0.6 }, colors: ['#0B0C10', confColor, '#FFFFFF'] });
             } catch(e){}
             
-            // ==========================================
-            // ✅ تم استبدال EmailJS بإرسال جوجل سكريبت هنا
-            // ==========================================
             try {
                 let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + " ثانية";
-                
                 let wrongAnswersText = wrongAnswersArray.length > 0 
                     ? wrongAnswersArray.join('\n') 
                     : "ممتاز! لم يخطئ الطالب في أي سؤال.";
 
-                // استدعاء دالة الإرسال مع تفعيل no-cors
                 sendReportToTeacher(
                     studentName, 
                     `${score} / ${quizData.length}`, 
@@ -957,7 +932,6 @@ function calculateScore() {
             } catch(e){
                 console.error("حدث خطأ أثناء محاولة الإرسال:", e);
             }
-            // ==========================================
             
         }, 100);
 
