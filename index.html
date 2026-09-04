@@ -11,7 +11,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Outfit:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- ❌ تم حذف مكتبة EmailJS من هنا ❌ -->
     
     <style>
         /* 🌌 Quantum Nexus Theme Variables */
@@ -532,11 +533,36 @@
 </div>
 
 <script>
-// --- EmailJS Setup ---
-const EMAILJS_SERVICE_ID = "service_uu1lnnq";
-const EMAILJS_PUBLIC_KEY = "KUgWaj4LYP2IAcRuZ";
-const EMAILJS_TEMPLATE_ID = "template_vlyjktl";
-(function(){ if (typeof emailjs !== 'undefined') emailjs.init(EMAILJS_PUBLIC_KEY); })();
+// ==========================================
+// ✅ دالة إرسال التقرير إلى جوجل سكريبت ✅
+// ==========================================
+
+// ⚠️ هام: ضع الرابط الذي حصلت عليه من جوجل هنا
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_d7j4VfzEKiYl0nbpx5bQ7x0kBOq6XlKugg-S4cWejdVhO0TaIw9qIW5EHzTWXXGGbA/exec";
+
+function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersText) {
+    let formData = new FormData();
+    formData.append("studentName", name);
+    formData.append("score", finalScore);
+    formData.append("percentage", finalPercent);
+    formData.append("date", new Date().toLocaleString('ar-EG'));
+    formData.append("timeSpent", time);
+    formData.append("wrongAnswers", wrongAnswersText);
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.result === "success") {
+            console.log("تم إرسال التقرير بنجاح للمستر!");
+        }
+    })
+    .catch(error => console.error("خطأ في الإرسال لجوجل:", error));
+}
+// ==========================================
+
 
 function tryVibrate(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch(e){} } }
 
@@ -632,7 +658,7 @@ function changeFontSize(change) {
     if(newSize >= 16 && newSize <= 30) { root.style.setProperty('--q-font-size', newSize + 'px'); }
 }
 
-// 📚 Data Array (Extracted from Images - 22 Questions perfectly mapped)
+// 📚 Data Array
 const rawData = [
     { q: "He's out of breath because he ........", options: ["was running", "had run", "has run", "has been running"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Present physical evidence (out of breath) of a continuous action that just stopped. We use present perfect continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما يكون فيه أثر بدني واضح في الحاضر (بينهج) لحدث كان مستمر وخلص للتو (الجري)، بنستخدم مضارع تام مستمر.</div>" },
     { q: "Ali has been living here since he was a child. This means ........", options: ["Ali no longer lives here", "Ali lived here", "Ali lives here now", "Ali is a child"], answer: 2, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The present perfect continuous indicates that an action started in the past and is still continuing in the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> المضارع التام المستمر معناه إن الحدث بدأ في الماضي ولسه مكمل ومستمر لحد اللحظة دي، يعني هو لسه عايش هنا.</div>" },
@@ -777,7 +803,6 @@ function loadQuestion() {
         optionsList.appendChild(div);
     });
 
-    // Removed Cinema Mode entirely. Just instant text display for full protection.
     document.getElementById("question-text-content").innerText = item.q;
     optionsList.classList.add("show-options");
 
@@ -856,8 +881,12 @@ function calculateScore() {
         document.getElementById("result-screen").style.display = "block";
         window.scroll({ top: 0, left: 0 });
 
-        let score = 0; const reviewList = document.getElementById("review-list"); 
+        let score = 0; 
+        const reviewList = document.getElementById("review-list"); 
         if(reviewList) reviewList.innerHTML = "";
+
+        // مصفوفة لحفظ الأسئلة الخاطئة
+        let wrongAnswersArray = [];
 
         quizData.forEach((item, index) => {
             const isCorrect = userAnswers[index] === item.answer;
@@ -866,6 +895,15 @@ function calculateScore() {
             let userOptText = "لم يتم الحل ❌";
             if (userAnswers[index] !== undefined && userAnswers[index] !== -1) userOptText = item.options[userAnswers[index]];
             const correctOpt = item.options[item.answer];
+
+            // ⚠️ حفظ الأخطاء لإرسالها في التقرير
+            if (!isCorrect) {
+                wrongAnswersArray.push(
+                    `السؤال ${index + 1}: ${item.originalQ}\n` +
+                    `❌ إجابة الطالب: ${userOptText}\n` +
+                    `✅ الإجابة الصحيحة: ${correctOpt}\n`
+                );
+            }
 
             const div = document.createElement("div");
             div.className = `review-item ${isCorrect ? 'is-correct is-correct-item' : 'is-wrong is-wrong-item'}`;
@@ -902,19 +940,29 @@ function calculateScore() {
                 if (percent >= 80 && typeof confetti === 'function') confetti({ particleCount: 300, spread: 150, origin: { y: 0.6 }, colors: ['#0B0C10', confColor, '#FFFFFF'] });
             } catch(e){}
             
+            // ==========================================
+            // ✅ تم استبدال EmailJS بإرسال جوجل سكريبت هنا
+            // ==========================================
             try {
-                if(typeof emailjs !== 'undefined') {
-                    let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + "s";
-                    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                        quiz_name: "Quantum Matrix",
-                        student_name: studentName, 
-                        score: `${score}/${quizData.length}`, 
-                        percentage: `${percent}%`, 
-                        time_taken: usedTime,
-                        date_time: new Date().toLocaleString('ar-EG')
-                    });
-                }
-            } catch(e){}
+                let usedTime = isTimeAttack ? "Time Attack" : (3600 - totalSeconds) + " ثانية";
+                
+                let wrongAnswersText = wrongAnswersArray.length > 0 
+                    ? wrongAnswersArray.join('\n') 
+                    : "ممتاز! لم يخطئ الطالب في أي سؤال.";
+
+                // استدعاء دالة الإرسال
+                sendReportToTeacher(
+                    studentName, 
+                    `${score} / ${quizData.length}`, 
+                    percent, 
+                    usedTime, 
+                    wrongAnswersText
+                );
+            } catch(e){
+                console.error("حدث خطأ أثناء محاولة الإرسال:", e);
+            }
+            // ==========================================
+            
         }, 100);
 
     } catch(e) { console.error("Error:", e); alert("حدث خطأ تقني أثناء معالجة النتيجة."); }
