@@ -171,9 +171,10 @@
         .avatar-option { font-size: 28px; padding: 10px 15px; background: rgba(0,0,0,0.4); border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition:0.2s;}
         .avatar-option.selected { background: var(--accent-glow); border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); transform: scale(1.1);}
 
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
         .input-group input {
             width: 100%; padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.5); color: var(--accent); font-size: 18px; outline: none; margin-bottom: 25px; font-weight: 800; text-align: center;
+            background: rgba(0,0,0,0.5); color: var(--accent); font-size: 18px; outline: none; font-weight: 800; text-align: center;
         }
         .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
         .input-group input::placeholder { color: var(--text-muted); font-weight: 600;}
@@ -452,7 +453,9 @@
             </div>
 
             <div class="input-group">
-                <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي عشان نبدأ..." autocomplete="off" onkeypress="if(event.key === 'Enter') startQuiz()">
+                <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي عشان نبدأ..." autocomplete="off">
+                <!-- 💡 الاقتراح 4: إيميل الطالب -->
+                <input type="email" id="studentEmail" placeholder="اكتب إيميلك لاستلام النتيجة (اختياري)..." autocomplete="off" onkeypress="if(event.key === 'Enter') startQuiz()">
             </div>
             <button type="button" class="btn btn-solid" style="width:100%" onclick="startQuiz()">START ASSESSMENT ➔</button>
         </div>
@@ -521,32 +524,30 @@
 
 <script>
 // ==========================================
-// ✅ دالة إرسال التقرير إلى جوجل سكريبت 
+// ✅ دالة الإرسال الشاملة لجوجل سكريبت
 // ==========================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9BPDps0wF3k2KrlJ0jnqIcVT63Z8t4uEdKmdjmYoEVhcW-bK0hW0rD-fJ0XsW6688Bw/exec";
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxE8VCuunr_aOv9RCrFm_zJPUnoBt_mYA0ony3oXSqEQzrIwgDVwgNi1zRQG2KdXzGONw/exec";
-
-function sendReportToTeacher(name, finalScore, finalPercent, time, wrongAnswersText) {
+function sendReportToTeacher(examName, name, email, finalScore, finalPercent, time, wrongAnswersText, cheatWarnings, weakestSkill) {
     let params = new URLSearchParams();
+    params.append("examName", examName);
     params.append("studentName", name);
+    params.append("studentEmail", email);
     params.append("score", finalScore);
     params.append("percentage", finalPercent);
-    // تم تعديل التنسيق إلى en-GB لتظهر باللغة الإنجليزية كما طلبت
     params.append("date", new Date().toLocaleString('en-GB'));
     params.append("timeSpent", time);
     params.append("wrongAnswers", wrongAnswersText);
+    params.append("cheatWarnings", cheatWarnings);
+    params.append("weakestSkill", weakestSkill);
 
     fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: params,
         mode: "no-cors", 
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
     })
-    .then(() => {
-        console.log("تم إرسال التقرير بنجاح للمستر!");
-    })
+    .then(() => console.log("تم إرسال التقرير الشامل بنجاح!"))
     .catch(error => console.error("خطأ:", error));
 }
 // ==========================================
@@ -582,7 +583,6 @@ function speakQuestion() {
     }
 }
 
-// Scratch Card
 function initScratchCard() {
     const container = document.getElementById("badge-award-box");
     const canvas = document.getElementById("scratch-canvas");
@@ -644,36 +644,36 @@ function changeFontSize(change) {
     if(newSize >= 16 && newSize <= 30) { root.style.setProperty('--q-font-size', newSize + 'px'); }
 }
 
+// 💡 الاقتراح 5: إضافة تصنيف المهارة (skill) لكل سؤال
 const rawData = [
-    { q: "He's out of breath because he ........", options: ["was running", "had run", "has run", "has been running"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Present physical evidence (out of breath) of a continuous action that just stopped. We use present perfect continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما يكون فيه أثر بدني واضح في الحاضر (بينهج) لحدث كان مستمر وخلص للتو (الجري)، بنستخدم مضارع تام مستمر.</div>" },
-    { q: "Ali has been living here since he was a child. This means ........", options: ["Ali no longer lives here", "Ali lived here", "Ali lives here now", "Ali is a child"], answer: 2, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The present perfect continuous indicates that an action started in the past and is still continuing in the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> المضارع التام المستمر معناه إن الحدث بدأ في الماضي ولسه مكمل ومستمر لحد اللحظة دي، يعني هو لسه عايش هنا.</div>" },
-    { q: "Ali ........ school. He has just arrived home.", options: ["has been to", "has been in", "has gone to", "has been"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'has been to' means he went to a place and returned. Since he just arrived home, he has returned.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> طالما هو لسه واصل البيت، يبقى هو (راح ورجع). ودايماً (ذهب وعاد) بنعبر عنها بـ has been to.</div>" },
-    { q: "I haven't met the General Manager ........ It's my first time to meet him.", options: ["lately", "never", "already", "before"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> We use 'before' at the end of a negative present perfect sentence to talk about past experiences up to now.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التعبير عن حاجة محصلتش خالص قبل كده (دي أول مرة)، بنستخدم كلمة before في نهاية الجملة المنفية.</div>" },
-    { q: "Our block of flats ........ since last week.", options: ["have repainted", "has been repainted", "has repainted", "have been repainted"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The subject 'block' is singular, and the sentence is passive (the block receives the action of repainting).</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> العمارة (مفرد) وهتتدهن يعني الجملة مبنية للمجهول، فهنختار has been + P.P.</div>" },
-    { q: "Tamer said that he ........ English for four hours now.", options: ["has been studying", "was studying", "is studying", "had been studying"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The word 'now' in reported speech shows the action is still relevant/happening, preventing the shift to past perfect. Present perfect continuous is retained.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> وجود كلمة now بيمنع تحويل الزمن للماضي الأبعد، وبياكد إن الحدث لسه مستمر، عشان كده بنحتفظ بالمضارع التام المستمر.</div>" },
-    { q: "They started living here in 2015. This means ........", options: ["They have started live here since 2015", "They haven't lived here since 2015", "They have started living here since 2015", "They have lived here since 2015"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The verb 'start' isn't used with 'since' for states. We use the main state verb 'live' in the present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل start مبياخدش since، الصح إننا نستخدم الفعل الأساسي (live) في المضارع التام للتعبير عن بداية المعيشة.</div>" },
-    { q: "They have been to Luxor. This means ........", options: ["They are in Luxor.", "They aren't in Luxor now.", "They will go to Luxor someday.", "They have gone to Luxor."], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'have been to' means a person went to a place and has already returned.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التعبير (have been to) معناه إنهم راحوا الأقصر ورجعوا منها، يعني هما مش هناك دلوقتي.</div>" },
-    { q: "We ........ to the tennis club since we moved here.", options: ["have belonged", "have been belonging", "had belonged", "belonged"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'belong' is a stative verb (showing possession/state). It cannot be used in any continuous tense.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل belong (ينتمي لـ) من أفعال الحالة، ومينفعش يتحطله ing خالص، فبنختار المضارع التام البسيط.</div>" },
-    { q: "We've visited my parents every week since we ........ the car.", options: ["'ve had", "'ve been having", "had had", "are having"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The clause after 'since' can be present perfect if the state (owning the car) started in the past and continues to the present. 'have' is stative here.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الجملة بعد since ممكن تيجي مضارع تام لو الحالة دي لسه مستمرة (لسه عندهم العربية). وطبعاً have كفعل ملكية مبياخدش ing.</div>" },
-    { q: "There's not much more to do, now that we ........ the main problem.", options: ["have been solving", "have solved", "are solving", "were solving"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The action is completely finished with a current result (not much left to do). Simple present perfect is required.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الحدث خلص واكتمل (حلينا المشكلة) ونتيجته واضحة دلوقتي، عشان كده بنستخدم مضارع تام بسيط.</div>" },
-    { q: "I ........ all the museums in the city over the past five years.", options: ["have visited", "have been visiting", "visited", "am visiting"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> When the sentence mentions the quantity/completion of an action ('all the museums'), we must use the simple perfect, not continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> طالما الجملة حددت الكمية أو العدد اللي تم إنجازه (كل المتاحف)، يبقى لازم مضارع تام بسيط ومينفعش نحط مستمر.</div>" },
-    { q: "He has just gone out. This sentence means ........", options: ["He is going out now", "He went out a few minutes ago", "He goes out every day", "He will go out soon"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'has just + PP' (Present Perfect) is equivalent in meaning to past simple with 'a moment ago' or 'a few minutes ago'.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> تعبير (has just) معناه إن الحاجة لسه حاصلة حالاً، وبتساوي في المعنى الماضي البسيط مع كلمة (منذ لحظات).</div>" },
-    { q: "I've lived here ........ most of my life.", options: ["already", "since", "ever", "for"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'most of my life' is a period/duration of time, so we use 'for'.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> عبارة (معظم حياتي) بتعبر عن مدة زمنية استغرقها الحدث، وعشان كده بنستخدم for.</div>" },
-    { q: "Neither of the witnesses ........ their testimony yet, which has delayed the trial.", options: ["has completed", "have completed", "hasn't completed", "had completed"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'Neither of' takes a singular verb formally. The sentence is already negative in meaning, so we don't need 'hasn't'. 'yet' dictates present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> كلمة Neither بتدي معنى النفي فمش محتاجين نفي تاني. وبعدها بييجي فعل مفرد، ومع وجود yet هنختار has completed.</div>" },
-    { q: "With their win yesterday, Italy ........ into second place in the table.", options: ["was moving", "has moved", "has been moving", "had moved"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The focus is on the present result (being in second place now) of a recent past event (yesterday's win).</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التركيز هنا على النتيجة الحالية (إيطاليا في المركز التاني دلوقتي) بسبب حدث لسه حاصل، فبنختار مضارع تام.</div>" },
-    { q: "Sorry I haven't been able to see you. I ........ very hard.", options: ["had been working", "was working", "'ve worked", "'ve been working"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Providing an excuse for a present situation (haven't been able) by referencing a recently ongoing continuous activity.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> هو بيعتذر عن موقف حالي بسبب إنه كان مشغول ومستمر في الشغل جداً الفترة دي، الأنسب مضارع تام مستمر.</div>" },
-    { q: "She ........ him for 10 years, so they are good friends.", options: ["has known", "has been known", "has been knowing", "had known"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The verb 'know' is a stative verb. Stative verbs are not used in continuous tenses.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل know (يعرف) من أفعال الإدراك، ومينفعش ييجي في الاستمرار (ing) خالص، فبنختار تام بسيط.</div>" },
-    { q: "The doctors ........ many patients today.", options: ["treat", "have treated", "have been treated", "will treat"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Mentioning a quantity ('many patients') achieved in an unfinished time period ('today') requires present perfect simple.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما نذكر الكمية أو العدد اللي تم (مرضى كتير) في فترة لسه مخلصتش (النهاردة)، لازم نستخدم مضارع تام بسيط.</div>" },
-    { q: "Since I first met her, I ........ to ask her out all this time, but I'm too shy.", options: ["have tried", "have been trying", "tried", "was trying"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'all this time' strongly emphasizes the duration and continuous nature of the action up to the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> عبارة (all this time) بتركز جداً على استمرارية الحدث ومعاناته طول الوقت ده، فبنختار مضارع تام مستمر.</div>" },
-    { q: "Why are you so quiet? - Because I ........ about the exam.", options: ["am thinking", "think", "thinks", "was thinking"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The question 'Why are you so quiet?' asks about the current moment. The answer uses present continuous for an action happening right now.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> السؤال عن سبب هدوءه في اللحظة الحالية، والرد بيبين إنه بيفكر حالاً (فعل حركي مش حالة)، فبنختار مضارع مستمر.</div>" },
-    { q: "How many times ........ that movie?", options: ["have you been seeing", "you have been seeing", "have you been seen", "have you seen"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Questions starting with 'How many times' focus on the number of completed experiences, requiring simple present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> السؤال بـ (كم عدد المرات) بيركز على المرات اللي اكتمل فيها الحدث، فمبنستخدمش استمرار ونختار مضارع تام بسيط.</div>" }
+    { q: "He's out of breath because he ........", skill: "Present Perfect Continuous", options: ["was running", "had run", "has run", "has been running"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Present physical evidence (out of breath) of a continuous action that just stopped. We use present perfect continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما يكون فيه أثر بدني واضح في الحاضر (بينهج) لحدث كان مستمر وخلص للتو (الجري)، بنستخدم مضارع تام مستمر.</div>" },
+    { q: "Ali has been living here since he was a child. This means ........", skill: "Present Perfect Continuous", options: ["Ali no longer lives here", "Ali lived here", "Ali lives here now", "Ali is a child"], answer: 2, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The present perfect continuous indicates that an action started in the past and is still continuing in the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> المضارع التام المستمر معناه إن الحدث بدأ في الماضي ولسه مكمل ومستمر لحد اللحظة دي، يعني هو لسه عايش هنا.</div>" },
+    { q: "Ali ........ school. He has just arrived home.", skill: "Present Perfect (been/gone)", options: ["has been to", "has been in", "has gone to", "has been"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'has been to' means he went to a place and returned. Since he just arrived home, he has returned.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> طالما هو لسه واصل البيت، يبقى هو (راح ورجع). ودايماً (ذهب وعاد) بنعبر عنها بـ has been to.</div>" },
+    { q: "I haven't met the General Manager ........ It's my first time to meet him.", skill: "Present Perfect (Keywords)", options: ["lately", "never", "already", "before"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> We use 'before' at the end of a negative present perfect sentence to talk about past experiences up to now.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التعبير عن حاجة محصلتش خالص قبل كده (دي أول مرة)، بنستخدم كلمة before في نهاية الجملة المنفية.</div>" },
+    { q: "Our block of flats ........ since last week.", skill: "Passive Voice (Present Perfect)", options: ["have repainted", "has been repainted", "has repainted", "have been repainted"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The subject 'block' is singular, and the sentence is passive (the block receives the action of repainting).</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> العمارة (مفرد) وهتتدهن يعني الجملة مبنية للمجهول، فهنختار has been + P.P.</div>" },
+    { q: "Tamer said that he ........ English for four hours now.", skill: "Reported Speech", options: ["has been studying", "was studying", "is studying", "had been studying"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The word 'now' in reported speech shows the action is still relevant/happening, preventing the shift to past perfect. Present perfect continuous is retained.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> وجود كلمة now بيمنع تحويل الزمن للماضي الأبعد، وبياكد إن الحدث لسه مستمر، عشان كده بنحتفظ بالمضارع التام المستمر.</div>" },
+    { q: "They started living here in 2015. This means ........", skill: "Present Perfect vs Past Simple", options: ["They have started live here since 2015", "They haven't lived here since 2015", "They have started living here since 2015", "They have lived here since 2015"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The verb 'start' isn't used with 'since' for states. We use the main state verb 'live' in the present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل start مبياخدش since، الصح إننا نستخدم الفعل الأساسي (live) في المضارع التام للتعبير عن بداية المعيشة.</div>" },
+    { q: "They have been to Luxor. This means ........", skill: "Present Perfect (been/gone)", options: ["They are in Luxor.", "They aren't in Luxor now.", "They will go to Luxor someday.", "They have gone to Luxor."], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'have been to' means a person went to a place and has already returned.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التعبير (have been to) معناه إنهم راحوا الأقصر ورجعوا منها، يعني هما مش هناك دلوقتي.</div>" },
+    { q: "We ........ to the tennis club since we moved here.", skill: "Stative Verbs", options: ["have belonged", "have been belonging", "had belonged", "belonged"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'belong' is a stative verb (showing possession/state). It cannot be used in any continuous tense.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل belong (ينتمي لـ) من أفعال الحالة، ومينفعش يتحطله ing خالص، فبنختار المضارع التام البسيط.</div>" },
+    { q: "We've visited my parents every week since we ........ the car.", skill: "Stative Verbs", options: ["'ve had", "'ve been having", "had had", "are having"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The clause after 'since' can be present perfect if the state (owning the car) started in the past and continues to the present. 'have' is stative here.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الجملة بعد since ممكن تيجي مضارع تام لو الحالة دي لسه مستمرة (لسه عندهم العربية). وطبعاً have كفعل ملكية مبياخدش ing.</div>" },
+    { q: "There's not much more to do, now that we ........ the main problem.", skill: "Present Perfect Simple", options: ["have been solving", "have solved", "are solving", "were solving"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The action is completely finished with a current result (not much left to do). Simple present perfect is required.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الحدث خلص واكتمل (حلينا المشكلة) ونتيجته واضحة دلوقتي، عشان كده بنستخدم مضارع تام بسيط.</div>" },
+    { q: "I ........ all the museums in the city over the past five years.", skill: "Present Perfect Simple", options: ["have visited", "have been visiting", "visited", "am visiting"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> When the sentence mentions the quantity/completion of an action ('all the museums'), we must use the simple perfect, not continuous.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> طالما الجملة حددت الكمية أو العدد اللي تم إنجازه (كل المتاحف)، يبقى لازم مضارع تام بسيط ومينفعش نحط مستمر.</div>" },
+    { q: "He has just gone out. This sentence means ........", skill: "Present Perfect vs Past Simple", options: ["He is going out now", "He went out a few minutes ago", "He goes out every day", "He will go out soon"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'has just + PP' (Present Perfect) is equivalent in meaning to past simple with 'a moment ago' or 'a few minutes ago'.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> تعبير (has just) معناه إن الحاجة لسه حاصلة حالاً، وبتساوي في المعنى الماضي البسيط مع كلمة (منذ لحظات).</div>" },
+    { q: "I've lived here ........ most of my life.", skill: "Present Perfect (Keywords)", options: ["already", "since", "ever", "for"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'most of my life' is a period/duration of time, so we use 'for'.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> عبارة (معظم حياتي) بتعبر عن مدة زمنية استغرقها الحدث، وعشان كده بنستخدم for.</div>" },
+    { q: "Neither of the witnesses ........ their testimony yet, which has delayed the trial.", skill: "Present Perfect (Keywords)", options: ["has completed", "have completed", "hasn't completed", "had completed"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'Neither of' takes a singular verb formally. The sentence is already negative in meaning, so we don't need 'hasn't'. 'yet' dictates present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> كلمة Neither بتدي معنى النفي فمش محتاجين نفي تاني. وبعدها بييجي فعل مفرد، ومع وجود yet هنختار has completed.</div>" },
+    { q: "With their win yesterday, Italy ........ into second place in the table.", skill: "Present Perfect Simple", options: ["was moving", "has moved", "has been moving", "had moved"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The focus is on the present result (being in second place now) of a recent past event (yesterday's win).</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> التركيز هنا على النتيجة الحالية (إيطاليا في المركز التاني دلوقتي) بسبب حدث لسه حاصل، فبنختار مضارع تام.</div>" },
+    { q: "Sorry I haven't been able to see you. I ........ very hard.", skill: "Present Perfect Continuous", options: ["had been working", "was working", "'ve worked", "'ve been working"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Providing an excuse for a present situation (haven't been able) by referencing a recently ongoing continuous activity.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> هو بيعتذر عن موقف حالي بسبب إنه كان مشغول ومستمر في الشغل جداً الفترة دي، الأنسب مضارع تام مستمر.</div>" },
+    { q: "She ........ him for 10 years, so they are good friends.", skill: "Stative Verbs", options: ["has known", "has been known", "has been knowing", "had known"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The verb 'know' is a stative verb. Stative verbs are not used in continuous tenses.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> الفعل know (يعرف) من أفعال الإدراك، ومينفعش ييجي في الاستمرار (ing) خالص، فبنختار تام بسيط.</div>" },
+    { q: "The doctors ........ many patients today.", skill: "Present Perfect Simple", options: ["treat", "have treated", "have been treated", "will treat"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Mentioning a quantity ('many patients') achieved in an unfinished time period ('today') requires present perfect simple.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> لما نذكر الكمية أو العدد اللي تم (مرضى كتير) في فترة لسه مخلصتش (النهاردة)، لازم نستخدم مضارع تام بسيط.</div>" },
+    { q: "Since I first met her, I ........ to ask her out all this time, but I'm too shy.", skill: "Present Perfect Continuous", options: ["have tried", "have been trying", "tried", "was trying"], answer: 1, exp: "<div class='exp-en'>💡 <b>Explanation:</b> 'all this time' strongly emphasizes the duration and continuous nature of the action up to the present.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> عبارة (all this time) بتركز جداً على استمرارية الحدث ومعاناته طول الوقت ده، فبنختار مضارع تام مستمر.</div>" },
+    { q: "Why are you so quiet? - Because I ........ about the exam.", skill: "Present Continuous", options: ["am thinking", "think", "thinks", "was thinking"], answer: 0, exp: "<div class='exp-en'>💡 <b>Explanation:</b> The question 'Why are you so quiet?' asks about the current moment. The answer uses present continuous for an action happening right now.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> السؤال عن سبب هدوءه في اللحظة الحالية، والرد بيبين إنه بيفكر حالاً (فعل حركي مش حالة)، فبنختار مضارع مستمر.</div>" },
+    { q: "How many times ........ that movie?", skill: "Present Perfect Simple", options: ["have you been seeing", "you have been seeing", "have you been seen", "have you seen"], answer: 3, exp: "<div class='exp-en'>💡 <b>Explanation:</b> Questions starting with 'How many times' focus on the number of completed experiences, requiring simple present perfect.</div><div class='exp-separator'></div><div class='exp-ar'>✨ <b>الخلاصة:</b> السؤال بـ (كم عدد المرات) بيركز على المرات اللي اكتمل فيها الحدث، فمبنستخدمش استمرار ونختار مضارع تام بسيط.</div>" }
 ];
 
 let quizData = [];
-let currentQuestion = 0, userAnswers = {}, studentName = "", selectedAvatar = '🌌';
+let currentQuestion = 0, userAnswers = {}, studentName = "", studentEmail = "", selectedAvatar = '🌌';
 let totalSeconds = 3600, qTimeLeft = 15, timerInterval = null, isTimeAttack = false;
 let isSubmitting = false; 
-
 let cheatWarnings = 0;
 const MAX_WARNINGS = 3;
 
@@ -707,12 +707,12 @@ function shuffleArray(array) {
 function initQuizData() {
     let tempArray = JSON.parse(JSON.stringify(rawData));
     shuffleArray(tempArray); 
-    
     quizData = tempArray.map((item, index) => {
         let correctText = item.options[item.answer];
         shuffleArray(item.options); 
         return {
             originalQ: item.q,
+            skill: item.skill,
             q: `${index + 1}. ` + item.q.replace(/^\d+\.\s*/, ''),
             options: item.options,
             answer: item.options.indexOf(correctText),
@@ -748,6 +748,7 @@ function startQuiz() {
     const input = document.getElementById("studentName").value.trim();
     if (!input) { alert("أدخل هويتك لبدء المصفوفة!"); return; }
     studentName = input; 
+    studentEmail = document.getElementById("studentEmail").value.trim(); // 💡 حفظ الإيميل
     
     initQuizData(); 
     
@@ -865,6 +866,7 @@ function calculateScore() {
         if(reviewList) reviewList.innerHTML = "";
 
         let wrongAnswersArray = [];
+        let skillMistakesCount = {}; // 💡 الاقتراح 5: تتبع الأخطاء لكل مهارة
 
         quizData.forEach((item, index) => {
             const isCorrect = userAnswers[index] === item.answer;
@@ -880,8 +882,11 @@ function calculateScore() {
             
             const correctOpt = item.options[item.answer];
 
-            // ⚠️ تنسيق احترافي للأخطاء في الإيميل بالإنجليزية مع دمج التفسير المزدوج
             if (!isCorrect) {
+                // تجميع إحصائيات نقطة الضعف
+                let skillName = item.skill || "General Grammar";
+                skillMistakesCount[skillName] = (skillMistakesCount[skillName] || 0) + 1;
+
                 let emailExplanation = item.exp
                     .replace(/class='exp-en'/g, "style='direction: ltr; text-align: left; color: #555; font-size: 14px; margin-bottom: 8px;'")
                     .replace(/class='exp-separator'/g, "style='width: 100%; height: 1px; border-bottom: 1px dashed #ccc; margin: 8px 0;'")
@@ -899,7 +904,6 @@ function calculateScore() {
                 );
             }
 
-            // واجهة الطالب بعد انتهاء الامتحان
             const div = document.createElement("div");
             div.className = `review-item ${isCorrect ? 'is-correct is-correct-item' : 'is-wrong is-wrong-item'}`;
             div.innerHTML = `<div style="font-weight:800;font-size:16px;margin-bottom:8px; direction: ltr; color: var(--text-main);">${item.q}</div>
@@ -908,6 +912,12 @@ function calculateScore() {
                 <div class="explanation-box">${item.exp}</div>`;
             if(reviewList) reviewList.appendChild(div);
         });
+
+        // 💡 حساب نقطة الضعف الأكبر (أكثر قاعدة أخطأ فيها)
+        let weakestSkill = "None";
+        if (Object.keys(skillMistakesCount).length > 0) {
+            weakestSkill = Object.keys(skillMistakesCount).reduce((a, b) => skillMistakesCount[a] > skillMistakesCount[b] ? a : b);
+        }
 
         const percent = Math.round((score / quizData.length) * 100);
         window.finalScore = score; window.finalPercent = percent;
@@ -940,12 +950,19 @@ function calculateScore() {
                     ? wrongAnswersArray.join('') 
                     : "<p style='text-align:center; font-weight:bold; color:#10B981; font-size: 16px;'>Excellent! The student made zero mistakes. 🎉</p>";
 
+                let currentExamName = "Quantum Matrix Challenge - Unit 1"; 
+
+                // 💡 استدعاء دالة الإرسال مع المرفقات الجديدة (إيميل الطالب، كاشف الغش، تحليل الضعف)
                 sendReportToTeacher(
+                    currentExamName, 
                     studentName, 
+                    studentEmail, 
                     `${score} / ${quizData.length}`, 
                     percent, 
                     usedTime, 
-                    wrongAnswersText
+                    wrongAnswersText,
+                    cheatWarnings,
+                    weakestSkill
                 );
             } catch(e){
                 console.error("حدث خطأ أثناء محاولة الإرسال:", e);
